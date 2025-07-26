@@ -58,7 +58,7 @@ POST http://localhost:8080/api/operation/admin/login
 
 ```json
 {
-    "message": "1753518433470ID or password is not correct",
+    "message": "ID or password is not correct",
     "error": "Unauthorized"
 }
 ```
