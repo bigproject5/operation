@@ -1,7 +1,7 @@
 package aivle.project.operation.infra;
 
 import aivle.project.operation.domain.dto.*;
-import aivle.project.operation.service.AdminService;
+import aivle.project.operation.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class AdminController {
 
-    private final AdminService adminService;
+    private final LoginService adminService;
     private final JwtUtil jwtUtil;
 
     @Autowired
-    public AdminController(AdminService adminService, JwtUtil jwtUtil) {
+    public AdminController(LoginService adminService, JwtUtil jwtUtil) {
         this.adminService = adminService;
         this.jwtUtil = jwtUtil;
     }

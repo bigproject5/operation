@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class AdminService implements UserDetailsService {
+public class LoginService implements UserDetailsService {
 
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
@@ -49,12 +49,12 @@ public class AdminService implements UserDetailsService {
     public LoginResponseDto adminLogin(LoginRequestDto requestDto){
         Optional<Admin> checkLoginId = adminRepository.findByLoginId(requestDto.getLoginId());
         if (checkLoginId.isEmpty()) {
-            throw new BadCredentialsException("ID or password is not correct");
+            throw new BadCredentialsException(System.currentTimeMillis() + "ID or password is not correct");
         }
 
         Admin admin = checkLoginId.get();
         if(!passwordEncoder.matches(requestDto.getPassword(), admin.getPassword())){
-            throw new BadCredentialsException("ID or password is not correct");
+            throw new BadCredentialsException(System.currentTimeMillis() + "ID or password is not correct");
         }
         String token = jwtUtil.createToken("ADMIN", admin.getAdminId());
         LoginResponseDto response = new LoginResponseDto();
@@ -70,12 +70,12 @@ public class AdminService implements UserDetailsService {
     public LoginResponseDto workerLogin(LoginRequestDto requestDto){
         Optional<Worker> checkLoginId = workerRepository.findByLoginId(requestDto.getLoginId());
         if (checkLoginId.isEmpty()) {
-            throw new BadCredentialsException("ID or password is not correct");
+            throw new BadCredentialsException(System.currentTimeMillis() + "ID or password is not correct");
         }
 
         Worker worker = checkLoginId.get();
         if(!passwordEncoder.matches(requestDto.getPassword(), worker.getPassword())){
-            throw new BadCredentialsException("ID or password is not correct");
+            throw new BadCredentialsException(System.currentTimeMillis() + "ID or password is not correct");
         }
 
         String token = jwtUtil.createToken("WORKER", worker.getWorkerId());
@@ -89,7 +89,7 @@ public class AdminService implements UserDetailsService {
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         Long adminId = Long.parseLong(userId);
         Admin admin = adminRepository.findByAdminId(adminId)
-                .orElseThrow(() -> new UsernameNotFoundException("Admin not found: " + adminId));
+                .orElseThrow(() -> new UsernameNotFoundException(System.currentTimeMillis() + "Admin not found: " + adminId));
 
         return User.builder()
                 .username(admin.getLoginId())
