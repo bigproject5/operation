@@ -11,6 +11,10 @@ import aivle.project.operation.infra.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +23,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class AdminService {
+public class AdminService implements UserDetailsService {
 
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
@@ -33,7 +37,7 @@ public class AdminService {
     public void signup(SignupRequestDto requestDto) {
         Optional<Admin> checkLoginId = adminRepository.findByLoginId(requestDto.getLoginId());
         if (checkLoginId.isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
+            throw new IllegalArgumentException("This ID already exists.");
         }
 
         String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
@@ -45,12 +49,12 @@ public class AdminService {
     public LoginResponseDto adminLogin(LoginRequestDto requestDto){
         Optional<Admin> checkLoginId = adminRepository.findByLoginId(requestDto.getLoginId());
         if (checkLoginId.isEmpty()) {
-            throw new BadCredentialsException("아이디 또는 비밀번호가 올바르지 않습니다");
+            throw new BadCredentialsException("ID or password is not correct");
         }
 
         Admin admin = checkLoginId.get();
         if(!passwordEncoder.matches(requestDto.getPassword(), admin.getPassword())){
-            throw new BadCredentialsException("아이디 또는 비밀번호가 올바르지 않습니다");
+            throw new BadCredentialsException("ID or password is not correct");
         }
         String token = jwtUtil.createToken("ADMIN", admin.getAdminId());
         LoginResponseDto response = new LoginResponseDto();
@@ -62,19 +66,16 @@ public class AdminService {
 
     /**
      * @TODO worker service 구현시 이동
-     * @param requestDto LoginRequestDto 아이디, 비밀번호
-     * @return response LoginResponseDto 토큰
      */
-    //Worker service 로 이동
     public LoginResponseDto workerLogin(LoginRequestDto requestDto){
         Optional<Worker> checkLoginId = workerRepository.findByLoginId(requestDto.getLoginId());
         if (checkLoginId.isEmpty()) {
-            throw new BadCredentialsException("아이디 또는 비밀번호가 올바르지 않습니다");
+            throw new BadCredentialsException("ID or password is not correct");
         }
 
         Worker worker = checkLoginId.get();
         if(!passwordEncoder.matches(requestDto.getPassword(), worker.getPassword())){
-            throw new BadCredentialsException("아이디 또는 비밀번호가 올바르지 않습니다");
+            throw new BadCredentialsException("ID or password is not correct");
         }
 
         String token = jwtUtil.createToken("WORKER", worker.getWorkerId());
@@ -84,4 +85,18 @@ public class AdminService {
         response.setExpiresIn(expirationTime / 1000); // 초
         return response;
     }
+    @Override
+    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+        Long adminId = Long.parseLong(userId);
+        Admin admin = adminRepository.findByAdminId(adminId)
+                .orElseThrow(() -> new UsernameNotFoundException("Admin not found: " + adminId));
+
+        return User.builder()
+                .username(admin.getLoginId())
+                .password(admin.getPassword())
+                .authorities("ROLE_ADMIN")
+                .build();
+
+    }
+
 }

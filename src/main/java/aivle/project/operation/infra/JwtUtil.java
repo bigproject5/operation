@@ -46,13 +46,13 @@ public class JwtUtil {
                     .parseClaimsJws(token)
                     .getBody();
 
-            System.out.println("유효한 토큰.");
+            System.out.println("Valid token.");
             return false;
 
         } catch (ExpiredJwtException e) {
-            System.out.println("토큰 만료됨: " + e.getMessage());
+            System.out.println("Token expired: " + e.getMessage());
         } catch (JwtException e) {
-            System.out.println("토큰 위조 혹은 기타 에러: " + e.getMessage());
+            System.out.println("Token forgery or other errors: " + e.getMessage());
         }
         return true;
     }
