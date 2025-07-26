@@ -64,9 +64,6 @@ public class LoginService implements UserDetailsService {
         return response;
     }
 
-    /**
-     * @TODO worker service 구현시 이동
-     */
     public LoginResponseDto workerLogin(LoginRequestDto requestDto){
         Optional<Worker> checkLoginId = workerRepository.findByLoginId(requestDto.getLoginId());
         if (checkLoginId.isEmpty()) {

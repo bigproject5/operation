@@ -10,24 +10,24 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class AdminController {
 
-    private final LoginService adminService;
+    private final LoginService loginService;
     private final JwtUtil jwtUtil;
 
     @Autowired
-    public AdminController(LoginService adminService, JwtUtil jwtUtil) {
-        this.adminService = adminService;
+    public AdminController(LoginService loginService, JwtUtil jwtUtil) {
+        this.loginService = loginService;
         this.jwtUtil = jwtUtil;
     }
 
     @PostMapping
     public ResponseEntity<SignupResponseDto> adminRegister(@RequestBody SignupRequestDto signupRequestDto){
-        adminService.signup(signupRequestDto);
+        loginService.signup(signupRequestDto);
         return ResponseEntity.ok(new SignupResponseDto(signupRequestDto));
     }
 
     @PostMapping(value = "/login")
     public ResponseEntity<LoginResponseDto> adminLogin(@RequestBody LoginRequestDto loginRequestDto){
-        LoginResponseDto response = adminService.adminLogin(loginRequestDto);
+        LoginResponseDto response = loginService.adminLogin(loginRequestDto);
         return ResponseEntity.ok(response);
     }
 
