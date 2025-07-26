@@ -1,10 +1,9 @@
 package aivle.project.operation.infra;
 
-
-import aivle.project.operation.domain.AdminRepository;
-import aivle.project.operation.domain.SignupResponse;
+import aivle.project.operation.domain.dto.LoginResponseDto;
 import aivle.project.operation.domain.dto.SignupRequestDto;
-import jakarta.transaction.Transactional;
+import aivle.project.operation.domain.dto.SignupResponseDto;
+import aivle.project.operation.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,23 +12,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping(value = "/api/operation/admin")
 @RestController
-@Transactional
 public class AdminController {
 
-    private final AdminRepository adminRepository;
+    private final AdminService adminService;
 
     @Autowired
-    public AdminController(AdminRepository adminRepository) {
-        this.adminRepository = adminRepository;
+    public AdminController(AdminService adminService) {
+        this.adminService = adminService;
     }
 
     @PostMapping
-    public ResponseEntity<SignupResponse> adminRegister(SignupRequest signupRequest){
-        return
+    public ResponseEntity<SignupResponseDto> adminRegister(SignupRequestDto signupRequestDto){
+        adminService.signup(signupRequestDto);
+        return ResponseEntity.ok(new SignupResponseDto(signupRequestDto));
     }
 
     @PostMapping(value = "/login")
-    public void adminLogin(){
+    public ResponseEntity<LoginResponseDto> adminLogin(){
 
+        return ResponseEntity.ok(new LoginResponseDto());
     }
 }

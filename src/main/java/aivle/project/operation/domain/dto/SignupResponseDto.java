@@ -1,6 +1,6 @@
 package aivle.project.operation.domain.dto;
 
-import aivle.project.operation.domain.SignupResponse;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +14,7 @@ public class SignupResponseDto {
     private String companyNumber;
     private String address;
 
-    public SignupResponseDto(SignupResponse signupResponse) {
+    public SignupResponseDto(SignupRequestDto signupResponse) {
         this.loginId = signupResponse.getLoginId();
         this.name = signupResponse.getName();
         this.email = signupResponse.getEmail();
