@@ -1,8 +1,6 @@
 # operation
 
-
----
-- 윈도우 어플리케이션 실행
+- (윈도우) 어플리케이션 실행
 ```angular2html
 .\gradlew.bat bootRun
 ```
