@@ -29,7 +29,7 @@ POST http://localhost:8080/api/operation/admin/login
 }
 ```
 
-- 토큰 테스트
+- 토큰 테스트용 API
 ```angular2html
 POST http://localhost:8080/api/operation/admin/test 
 Authorization:"Bearer <JWT-토큰>"
