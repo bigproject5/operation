@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,12 +22,14 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final LoginService adminService;
+    private final LoginService loginService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         //토큰 파싱
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        long userId = Long.parseLong(request.getHeader("X-User-Id"));
+        String role = request.getHeader("X-User-Role");
 
         //토큰이 없거나 형식이 맞지 않으면 다음 필터로 넘김
         if(authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")){
@@ -35,12 +38,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authorizationHeader.substring(7);
-        // 토큰이 유효한지 확인
+
         if(!jwtUtil.isExpired(token)) {
-            Long userId = jwtUtil.getUserId(token);
-            //사용자 ID로 UserDetails 객체 생성
-            UserDetails userDetails = adminService.loadUserByUsername(userId.toString());
-            //SecurityContext에 인증 정보 설정
+            UserDetails userDetails = getUserDetails(userId, role);
+
             UsernamePasswordAuthenticationToken authentication = new
                     UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities()
@@ -50,4 +51,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
+
+    private UserDetails getUserDetails(Long userId, String role) {
+        if(role.equals("ADMIN")){
+            return loginService.loadUserByAdminId(userId);
+        }
+        else if(role.equals("WORKER")){
+            return loginService.loadUserByWorkerId(userId);
+        }
+        throw new IllegalArgumentException("Invalid role");
+    }
+
 }
