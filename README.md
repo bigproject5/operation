@@ -113,6 +113,10 @@ http POST http://localhost:8080/api/operation/worker/login loginId=worker passwo
 ---
 
 ## 토큰 테스트용 API
+- 테스트는 gateway를 거쳐야 함
+
+
+- 관리자 토큰 테스트용 API
 ```
 POST http://localhost:8080/api/operation/admin/test
 ```
