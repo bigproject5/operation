@@ -2,6 +2,7 @@ package aivle.project.operation.infra;
 
 import aivle.project.operation.domain.dto.*;
 import aivle.project.operation.service.LoginService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,13 +21,13 @@ public class LoginController {
     }
 
     @PostMapping(value = "/admin")
-    public ResponseEntity<SignupResponseDto> adminRegister(@RequestBody SignupRequestDto signupRequestDto){
+    public ResponseEntity<SignupResponseDto> adminRegister(@RequestBody @Valid SignupRequestDto signupRequestDto){
         loginService.adminSignup(signupRequestDto);
         return ResponseEntity.ok(new SignupResponseDto(signupRequestDto));
     }
 
     @PostMapping(value = "/worker")
-    public ResponseEntity<SignupResponseDto> workerRegister(@RequestBody WorkerSignupRequestDto workerSignupRequestDto){
+    public ResponseEntity<SignupResponseDto> workerRegister(@RequestBody @Valid WorkerSignupRequestDto workerSignupRequestDto){
         loginService.workerSignup(workerSignupRequestDto);
         return ResponseEntity.ok(new SignupResponseDto(workerSignupRequestDto));
     }
