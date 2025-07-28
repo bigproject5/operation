@@ -5,7 +5,7 @@
 .\gradlew.bat bootRun
 ```
 
-### 회원가입
+## 회원가입
 - 관리자
 ```
 POST http://localhost:8080/api/operation/admin
@@ -61,8 +61,9 @@ http POST http://localhost:8080/api/operation/admin loginId=admin123 password=12
 ```bash
 http POST http://localhost:8080/api/operation/worker loginId=worker password=123 name=작업자 email=admin@example.com phoneNumber=01012345678 companyNumber=123-45-67890 address="서울특별시 강남구"
 ```
+---
 
-### 로그인
+## 로그인
 
 ```
 POST http://localhost:8080/api/operation/admin/login
@@ -109,10 +110,9 @@ http POST http://localhost:8080/api/operation/admin/login loginId=admin123 passw
 ```bash
 http POST http://localhost:8080/api/operation/worker/login loginId=worker password=123 
 ```
+---
 
-
-
-- 관리자 토큰 테스트용 API
+## 토큰 테스트용 API
 ```
 POST http://localhost:8080/api/operation/admin/test
 ```
