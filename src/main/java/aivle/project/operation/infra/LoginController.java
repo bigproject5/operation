@@ -38,15 +38,14 @@ public class LoginController {
     }
 
     //작업자 로그인 테스트용 API
-    //api 변경 예정
     @PostMapping(value = "/worker/login")
     public ResponseEntity<LoginResponseDto> workerLogin(@RequestBody LoginRequestDto loginRequestDto){
         LoginResponseDto response = loginService.workerLogin(loginRequestDto);
         return ResponseEntity.ok(response);
     }
 
-    //for token test api
-    @PostMapping(value = "/test")
+    //인가 테스트 - admin
+    @PostMapping(value = "/admin/test")
     public ResponseEntity<ResponseDto> tokenTest(
             @RequestHeader("Authorization") String token,
             @RequestHeader("X-User-Id") String userId,
@@ -63,15 +62,15 @@ public class LoginController {
         }
         else{
             response.setCode(200);
-            response.setMessage("Token is valid");
+            response.setMessage("Token is valid: " + role + userId);
             response.setRequest(requestDto.getMessage());
             response.setId(Long.parseLong(userId));
             response.setRole(role);
         }
         return ResponseEntity.ok(response);
     }
-    //for token test api
-    @PostMapping(value = "/worker_test")
+    //인가 테스트 - worker
+    @PostMapping(value = "/worker/test")
     public ResponseEntity<ResponseDto> workerTokenTest(
             @RequestHeader("Authorization") String token,
             @RequestHeader("X-User-Id") String userId,
