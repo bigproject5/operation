@@ -11,15 +11,15 @@ public class SignupResponseDto {
     private String name;
     private String email;
     private String phoneNumber;
-    private String companyNumber;
+    private String employeeNumber;
     private String address;
 
-    public SignupResponseDto(SignupRequestDto signupResponse) {
+    public SignupResponseDto(AdminSignupRequestDto signupResponse) {
         this.loginId = signupResponse.getLoginId();
         this.name = signupResponse.getName();
         this.email = signupResponse.getEmail();
         this.phoneNumber = signupResponse.getPhoneNumber();
-        this.companyNumber = signupResponse.getCompanyNumber();
+        this.employeeNumber = signupResponse.getEmployeeNumber();
         this.address = signupResponse.getAddress();
     }
 
@@ -28,7 +28,7 @@ public class SignupResponseDto {
         this.name = workerSignupRequestDto.getName();
         this.email = workerSignupRequestDto.getEmail();
         this.phoneNumber = workerSignupRequestDto.getPhoneNumber();
-        this.companyNumber = workerSignupRequestDto.getCompanyNumber();
+        this.employeeNumber = workerSignupRequestDto.getEmployeeNumber();
         this.address = workerSignupRequestDto.getAddress();
     }
 }

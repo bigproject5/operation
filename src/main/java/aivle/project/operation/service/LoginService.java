@@ -6,7 +6,7 @@ import aivle.project.operation.domain.Worker;
 import aivle.project.operation.domain.WorkerRepository;
 import aivle.project.operation.domain.dto.LoginRequestDto;
 import aivle.project.operation.domain.dto.LoginResponseDto;
-import aivle.project.operation.domain.dto.SignupRequestDto;
+import aivle.project.operation.domain.dto.AdminSignupRequestDto;
 import aivle.project.operation.domain.dto.WorkerSignupRequestDto;
 import aivle.project.operation.infra.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class LoginService {
     private Long expirationTime;
 
     @Transactional
-    public void adminSignup(SignupRequestDto requestDto) {
+    public void adminSignup(AdminSignupRequestDto requestDto) {
         Optional<Admin> checkLoginId = adminRepository.findByLoginId(requestDto.getLoginId());
         if (checkLoginId.isPresent()) {
             throw new IllegalArgumentException("This ID already exists.");

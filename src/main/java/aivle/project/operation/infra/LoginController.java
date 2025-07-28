@@ -21,9 +21,9 @@ public class LoginController {
     }
 
     @PostMapping(value = "/admin")
-    public ResponseEntity<SignupResponseDto> adminRegister(@RequestBody @Valid SignupRequestDto signupRequestDto){
-        loginService.adminSignup(signupRequestDto);
-        return ResponseEntity.ok(new SignupResponseDto(signupRequestDto));
+    public ResponseEntity<SignupResponseDto> adminRegister(@RequestBody @Valid AdminSignupRequestDto adminSignupRequestDto){
+        loginService.adminSignup(adminSignupRequestDto);
+        return ResponseEntity.ok(new SignupResponseDto(adminSignupRequestDto));
     }
 
     @PostMapping(value = "/worker")

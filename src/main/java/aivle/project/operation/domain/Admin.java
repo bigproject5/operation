@@ -26,7 +26,7 @@ public class Admin {
     private String name;
     private String email;
     private String phoneNumber;
-    private String companyNumber;
+    private String employeeNumber;
     private String address;
     private String adminCode;
 

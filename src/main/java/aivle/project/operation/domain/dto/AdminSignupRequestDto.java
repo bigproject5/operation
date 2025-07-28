@@ -10,7 +10,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SignupRequestDto {
+public class AdminSignupRequestDto {
 
     @NotBlank(message = "Login ID must not be empty.")
     @Size(min = 8, max = 20, message = "Login ID must be between 8 and 20 characters.")
@@ -23,11 +23,19 @@ public class SignupRequestDto {
     )
     private String password;
 
+    @NotBlank(message = "name must not be empty.")
     private String name;
+
     private String email;
+
     private String phoneNumber;
-    private String companyNumber;
+
+    @NotBlank(message = "Employee number must not be empty.")
+    private String employeeNumber;
+
     private String address;
+
+    @NotBlank(message = "admin code must not be empty.")
     private String adminCode;
 
     public Admin toEntity(String encodedPassword) {
@@ -37,7 +45,7 @@ public class SignupRequestDto {
         admin.setName(this.name);
         admin.setEmail(this.email);
         admin.setPhoneNumber(this.phoneNumber);
-        admin.setCompanyNumber(this.companyNumber);
+        admin.setEmployeeNumber(this.employeeNumber);
         admin.setAddress(this.address);
         admin.setAdminCode(this.adminCode);
         return admin;

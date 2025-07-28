@@ -21,10 +21,17 @@ public class WorkerSignupRequestDto {
             message = "Password must be 8–32 characters long and include at least one number and one special character."
     )
     private String password;
+
+    @NotBlank(message = "Employee number must not be empty.")
     private String name;
+
     private String email;
+
     private String phoneNumber;
-    private String companyNumber;
+
+    @NotBlank(message = "Employee number must not be empty.")
+    private String employeeNumber;
+
     private String address;
 
     public Worker toEntity(String password) {
@@ -35,7 +42,7 @@ public class WorkerSignupRequestDto {
         worker.setName(name);
         worker.setEmail(email);
         worker.setPhoneNumber(phoneNumber);
-        worker.setCompanyNumber(companyNumber);
+        worker.setEmployeeNumber(employeeNumber);
         worker.setAddress(address);
         worker.setCreatedAt(date);
         return worker;
