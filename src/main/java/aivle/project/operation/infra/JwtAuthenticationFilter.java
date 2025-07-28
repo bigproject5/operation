@@ -27,11 +27,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         //토큰 파싱
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        long userId = Long.parseLong(request.getHeader("X-User-Id"));
+        String userId =request.getHeader("X-User-Id");
         String role = request.getHeader("X-User-Role");
 
         //토큰이 없거나 형식이 맞지 않으면 다음 필터로 넘김
-        if(authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")){
+        if(authorizationHeader == null || userId == null || role == null || !authorizationHeader.startsWith("Bearer ")){
             filterChain.doFilter(request, response);
             return;
         }
@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authorizationHeader.substring(7);
 
         if(!jwtUtil.isExpired(token)) {
-            UserDetails userDetails = getUserDetails(userId, role);
+            UserDetails userDetails = getUserDetails(Long.valueOf(userId), role);
 
             UsernamePasswordAuthenticationToken authentication = new
                     UsernamePasswordAuthenticationToken(
