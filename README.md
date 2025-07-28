@@ -5,7 +5,8 @@
 .\gradlew.bat bootRun
 ```
 
-- 회원가입
+### 회원가입
+- 관리자
 ```
 POST http://localhost:8080/api/operation/admin
 ```
@@ -19,6 +20,22 @@ POST http://localhost:8080/api/operation/admin
     "companyNumber": "123-45-67890",
     "address": "서울특별시 강남구",
     "adminCode": "ADM001"
+}
+```
+
+- 작업자
+```
+POST http://localhost:8080/api/operation/worker
+```
+```json
+{
+    "loginId": "worker123",
+    "password": "123",
+    "name": "작업자",
+    "email": "admin@example.com",
+    "phoneNumber": "01012345678",
+    "companyNumber": "123-45-67890",
+    "address": "서울특별시 강남구"
 }
 ```
 - 성공
@@ -35,9 +52,20 @@ POST http://localhost:8080/api/operation/admin
 - 실패
     - 403   
 
-- 로그인
+
+### 로그인
 ```
 POST http://localhost:8080/api/operation/admin/login
+```
+```json
+{
+  "loginId": "admin123",
+  "password": "123"
+}
+```
+- 작업자
+```
+POST http://localhost:8080/api/operation/worker/login
 ```
 ```json
 {
@@ -63,7 +91,7 @@ POST http://localhost:8080/api/operation/admin/login
 }
 ```
 
-- 토큰 테스트용 API
+- 관리자 토큰 테스트용 API
 ```
 POST http://localhost:8080/api/operation/admin/test
 ```
@@ -75,6 +103,20 @@ Authorization:"Bearer <JWT-토큰>"
     "message": "데이터 요청 A"
 }
 ```
+
+- 작업자 토큰 테스트용 API
+```
+POST http://localhost:8080/api/operation/worker/test
+```
+```
+Authorization:"Bearer <JWT-토큰>"
+```
+```json
+{
+    "message": "데이터 요청 A"
+}
+```
+
 - 성공
 
 ```json
