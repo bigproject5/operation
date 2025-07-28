@@ -69,7 +69,7 @@ public class LoginService {
         if(!passwordEncoder.matches(requestDto.getPassword(), admin.getPassword())){
             throw new BadCredentialsException("ID or password is not correct");
         }
-        String token = jwtUtil.createToken("ADMIN", admin.getAdminId());
+        String token = jwtUtil.createToken("ADMIN", admin.getAdminId(), admin.getName());
         LoginResponseDto response = new LoginResponseDto();
         response.setToken(token);
         response.setRole("ADMIN");
@@ -89,7 +89,7 @@ public class LoginService {
             throw new BadCredentialsException("ID or password is not correct");
         }
 
-        String token = jwtUtil.createToken("WORKER", worker.getWorkerId());
+        String token = jwtUtil.createToken("WORKER", worker.getWorkerId(), worker.getName());
         LoginResponseDto response = new LoginResponseDto();
         response.setToken(token);
         response.setRole("WORKER");

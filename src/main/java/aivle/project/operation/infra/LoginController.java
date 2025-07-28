@@ -37,8 +37,7 @@ public class LoginController {
         LoginResponseDto response = loginService.adminLogin(loginRequestDto);
         return ResponseEntity.ok(response);
     }
-
-    //작업자 로그인 테스트용 API
+    
     @PostMapping(value = "/worker/login")
     public ResponseEntity<LoginResponseDto> workerLogin(@RequestBody LoginRequestDto loginRequestDto){
         LoginResponseDto response = loginService.workerLogin(loginRequestDto);
