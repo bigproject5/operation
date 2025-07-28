@@ -7,6 +7,7 @@ import aivle.project.operation.domain.WorkerRepository;
 import aivle.project.operation.domain.dto.LoginRequestDto;
 import aivle.project.operation.domain.dto.LoginResponseDto;
 import aivle.project.operation.domain.dto.SignupRequestDto;
+import aivle.project.operation.domain.dto.WorkerSignupRequestDto;
 import aivle.project.operation.infra.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +24,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class LoginService implements UserDetailsService {
+public class LoginService {
 
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
@@ -34,7 +35,7 @@ public class LoginService implements UserDetailsService {
     private Long expirationTime;
 
     @Transactional
-    public void signup(SignupRequestDto requestDto) {
+    public void adminSignup(SignupRequestDto requestDto) {
         Optional<Admin> checkLoginId = adminRepository.findByLoginId(requestDto.getLoginId());
         if (checkLoginId.isPresent()) {
             throw new IllegalArgumentException("This ID already exists.");
@@ -44,6 +45,19 @@ public class LoginService implements UserDetailsService {
 
         Admin admin = requestDto.toEntity(encodedPassword);
         adminRepository.save(admin);
+    }
+
+    @Transactional
+    public void workerSignup(WorkerSignupRequestDto requestDto) {
+        Optional<Worker> checkLoginId = workerRepository.findByLoginId(requestDto.getLoginId());
+        if (checkLoginId.isPresent()) {
+            throw new IllegalArgumentException("This ID already exists.");
+        }
+
+        String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
+
+        Worker worker = requestDto.toEntity(encodedPassword);
+        workerRepository.save(worker);
     }
 
     public LoginResponseDto adminLogin(LoginRequestDto requestDto){
@@ -65,6 +79,7 @@ public class LoginService implements UserDetailsService {
     }
 
     public LoginResponseDto workerLogin(LoginRequestDto requestDto){
+        //회원가입 구현 안되어있음
         Optional<Worker> checkLoginId = workerRepository.findByLoginId(requestDto.getLoginId());
         if (checkLoginId.isEmpty()) {
             throw new BadCredentialsException("ID or password is not correct");
@@ -82,18 +97,27 @@ public class LoginService implements UserDetailsService {
         response.setExpiresIn(expirationTime / 1000); // 초
         return response;
     }
-    @Override
-    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        Long adminId = Long.parseLong(userId);
-        Admin admin = adminRepository.findByAdminId(adminId)
-                .orElseThrow(() -> new UsernameNotFoundException("Admin not found: " + adminId));
+
+    public UserDetails loadUserByAdminId(Long userId) throws UsernameNotFoundException {
+        Admin admin = adminRepository.findByAdminId(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("Admin not found: " + userId));
 
         return User.builder()
                 .username(admin.getLoginId())
                 .password(admin.getPassword())
                 .authorities("ROLE_ADMIN")
                 .build();
+    }
 
+    public UserDetails loadUserByWorkerId(Long userId) throws UsernameNotFoundException {
+        Worker worker = workerRepository.findByWorkerId(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("Admin not found: " + userId));
+
+        return User.builder()
+                .username(worker.getLoginId())
+                .password(worker.getPassword())
+                .authorities("ROLE_WORKER")
+                .build();
     }
 
 }

@@ -22,4 +22,13 @@ public class SignupResponseDto {
         this.companyNumber = signupResponse.getCompanyNumber();
         this.address = signupResponse.getAddress();
     }
+
+    public SignupResponseDto(WorkerSignupRequestDto workerSignupRequestDto) {
+        this.loginId = workerSignupRequestDto.getLoginId();
+        this.name = workerSignupRequestDto.getName();
+        this.email = workerSignupRequestDto.getEmail();
+        this.phoneNumber = workerSignupRequestDto.getPhoneNumber();
+        this.companyNumber = workerSignupRequestDto.getCompanyNumber();
+        this.address = workerSignupRequestDto.getAddress();
+    }
 }

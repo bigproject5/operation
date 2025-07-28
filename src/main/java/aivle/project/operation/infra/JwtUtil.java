@@ -20,23 +20,23 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    public Long getUserId(String token){
-        return Jwts.parserBuilder()
-                .setSigningKey(getKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("id", Long.class);
-    }
-
-    public String getUserRole(String token){
-        return Jwts.parserBuilder()
-                .setSigningKey(getKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("role", String.class);
-    }
+//    public Long getUserId(String token){
+//        return Jwts.parserBuilder()
+//                .setSigningKey(getKey())
+//                .build()
+//                .parseClaimsJws(token)
+//                .getBody()
+//                .get("id", Long.class);
+//    }
+//
+//    public String getUserRole(String token){
+//        return Jwts.parserBuilder()
+//                .setSigningKey(getKey())
+//                .build()
+//                .parseClaimsJws(token)
+//                .getBody()
+//                .get("role", String.class);
+//    }
 
     public boolean isExpired(String token){
         try {
