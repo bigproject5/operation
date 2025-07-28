@@ -14,7 +14,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -31,8 +30,8 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/operation/admin", "/api/operation/admin/login", "/h2-console/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/operation/admin/test").hasRole("ADMIN")
+                        .anyRequest().permitAll()
                 )
                 .headers(headers -> headers
                         .frameOptions(frameOptions -> frameOptions.sameOrigin())
