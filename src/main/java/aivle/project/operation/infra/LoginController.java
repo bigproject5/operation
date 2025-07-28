@@ -1,0 +1,100 @@
+package aivle.project.operation.infra;
+
+import aivle.project.operation.domain.dto.*;
+import aivle.project.operation.service.LoginService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RequestMapping(value = "/api/operation")
+@RestController
+public class LoginController {
+
+    private final LoginService loginService;
+    private final JwtUtil jwtUtil;
+
+    @Autowired
+    public LoginController(LoginService loginService, JwtUtil jwtUtil) {
+        this.loginService = loginService;
+        this.jwtUtil = jwtUtil;
+    }
+
+    @PostMapping(value = "/admin")
+    public ResponseEntity<SignupResponseDto> adminRegister(@RequestBody SignupRequestDto signupRequestDto){
+        loginService.adminSignup(signupRequestDto);
+        return ResponseEntity.ok(new SignupResponseDto(signupRequestDto));
+    }
+
+    @PostMapping(value = "/worker")
+    public ResponseEntity<SignupResponseDto> workerRegister(@RequestBody WorkerSignupRequestDto workerSignupRequestDto){
+        loginService.workerSignup(workerSignupRequestDto);
+        return ResponseEntity.ok(new SignupResponseDto(workerSignupRequestDto));
+    }
+
+    @PostMapping(value = "/admin/login")
+    public ResponseEntity<LoginResponseDto> adminLogin(@RequestBody LoginRequestDto loginRequestDto){
+        LoginResponseDto response = loginService.adminLogin(loginRequestDto);
+        return ResponseEntity.ok(response);
+    }
+
+    //작업자 로그인 테스트용 API
+    //api 변경 예정
+    @PostMapping(value = "/worker/login")
+    public ResponseEntity<LoginResponseDto> workerLogin(@RequestBody LoginRequestDto loginRequestDto){
+        LoginResponseDto response = loginService.workerLogin(loginRequestDto);
+        return ResponseEntity.ok(response);
+    }
+
+    //for token test api
+    @PostMapping(value = "/test")
+    public ResponseEntity<ResponseDto> tokenTest(
+            @RequestHeader("Authorization") String token,
+            @RequestHeader("X-User-Id") String userId,
+            @RequestHeader("X-User-Role") String role,
+            @RequestBody RequestDto requestDto
+    ){
+
+        String jwt = token.substring(7);
+        ResponseDto response = new ResponseDto();
+        if(jwtUtil.isExpired(jwt)){
+            response.setCode(403);
+            response.setRequest(requestDto.getMessage());
+            response.setMessage("Token is not valid");
+        }
+        else{
+            response.setCode(200);
+            response.setMessage("Token is valid");
+            response.setRequest(requestDto.getMessage());
+            response.setId(Long.parseLong(userId));
+            response.setRole(role);
+        }
+        return ResponseEntity.ok(response);
+    }
+    //for token test api
+    @PostMapping(value = "/worker_test")
+    public ResponseEntity<ResponseDto> workerTokenTest(
+            @RequestHeader("Authorization") String token,
+            @RequestHeader("X-User-Id") String userId,
+            @RequestHeader("X-User-Role") String role,
+            @RequestBody RequestDto requestDto
+    ){
+
+        String jwt = token.substring(7);
+        ResponseDto response = new ResponseDto();
+        if(jwtUtil.isExpired(jwt)){
+            response.setCode(403);
+            response.setRequest(requestDto.getMessage());
+            response.setMessage("Token is not valid");
+        }
+        else{
+            response.setCode(200);
+            response.setMessage("Token is valid: " + role + userId);
+            response.setRequest(requestDto.getMessage());
+            response.setId(Long.parseLong(userId));
+            response.setRole(role);
+        }
+        return ResponseEntity.ok(response);
+    }
+
+
+}
