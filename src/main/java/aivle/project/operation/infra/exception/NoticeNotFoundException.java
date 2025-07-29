@@ -1,4 +1,4 @@
-package aivle.project.operation.infra;
+package aivle.project.operation.infra.exception;
 
 public class NoticeNotFoundException extends RuntimeException {
     public NoticeNotFoundException(String message) {

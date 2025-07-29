@@ -1,4 +1,4 @@
-package aivle.project.operation.infra;
+package aivle.project.operation.infra.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -79,27 +79,18 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<?> handleBadCredentials(BadCredentialsException ex) {
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of(
-                        "error", "Unauthorized",
-                        "message", ex.getMessage()
-                ));
-    }
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
-        String errorMessage = ex.getBindingResult().getFieldErrors().stream()
-                .map(error -> error.getDefaultMessage())
-                .findFirst()
-                .orElse("Invalid input");
+    public ResponseEntity<?> handleBadCredentials(BadCredentialsException e) {
+        log.error("Unexpected error occurred: ", e);
 
-        return  ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(Map.of(
-                        "error", "Bad Request",
-                        "message", errorMessage
-                ));
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .error("Unauthorized")
+                .message(e.getMessage())
+                .path("/api/notices")
+                .build();
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -118,16 +109,6 @@ public class GlobalExceptionHandler {
                 .body(Map.of(
                         "error", "Bad Request",
                         "message", "Request body is missing or malformed."
-                ));
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(Exception ex) {
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of(
-                        "error", "Internal Server Error",
-                        "message", ex.getMessage()
                 ));
     }
 

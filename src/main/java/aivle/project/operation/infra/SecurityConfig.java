@@ -3,6 +3,7 @@ package aivle.project.operation.infra;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -30,6 +31,8 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/operation/admin/test").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/operation/notices").permitAll()
+                        .requestMatchers("/api/operation/notices").hasRole("ADMIN")
                         .requestMatchers("/api/operation/worker/test").hasRole("WORKER")
                         .anyRequest().permitAll()
                 )
