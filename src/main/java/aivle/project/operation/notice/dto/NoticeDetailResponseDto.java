@@ -16,7 +16,7 @@ public class NoticeDetailResponseDto {
     private Long id;
     private String title;
     private String content;
-    private String author;
+    private String admin;
     private Integer viewCount;
     private Boolean isActive;
     private LocalDateTime createdAt;
@@ -28,7 +28,7 @@ public class NoticeDetailResponseDto {
                 .id(notice.getId())
                 .title(notice.getTitle())
                 .content(notice.getContent())
-                .author(notice.getAuthor())
+                .admin(notice.getAdmin())
                 .viewCount(notice.getViewCount())
                 .isActive(notice.getIsActive())
                 .createdAt(notice.getCreatedAt())

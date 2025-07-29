@@ -97,17 +97,17 @@ public class NoticeController {
 
     /**
      * 공지사항 작성자 검색 API
-     * GET /api/notices/search/author?keyword=작성자&page=0&size=10
+     * GET /api/notices/search/admin?keyword=작성자&page=0&size=10
      */
-    @GetMapping("/search/author")
-    public ResponseEntity<Page<NoticeListResponseDto>> searchNoticesByAuthor(
+    @GetMapping("/search/admin")
+    public ResponseEntity<Page<NoticeListResponseDto>> searchNoticesByAdmin(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        log.info("GET /api/notices/search/author - keyword: {}, page: {}, size: {}", keyword, page, size);
+        log.info("GET /api/notices/search/admin - keyword: {}, page: {}, size: {}", keyword, page, size);
 
-        Page<NoticeListResponseDto> notices = noticeService.searchNoticesByAuthor(keyword, page, size);
+        Page<NoticeListResponseDto> notices = noticeService.searchNoticesByAdmin(keyword, page, size);
         return ResponseEntity.ok(notices);
     }
 

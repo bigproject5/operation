@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class NoticeListResponseDto {
     private Long id;
     private String title;
-    private String author;
+    private String admin;
     private Integer viewCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -25,7 +25,7 @@ public class NoticeListResponseDto {
         return NoticeListResponseDto.builder()
                 .id(notice.getId())
                 .title(notice.getTitle())
-                .author(notice.getAuthor())
+                .admin(notice.getAdmin())
                 .viewCount(notice.getViewCount())
                 .createdAt(notice.getCreatedAt())
                 .updatedAt(notice.getUpdatedAt())

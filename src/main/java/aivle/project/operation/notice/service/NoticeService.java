@@ -99,12 +99,12 @@ public class NoticeService {
     /**
      * 작성자로 공지사항 검색
      */
-    public Page<NoticeListResponseDto> searchNoticesByAuthor(String adminId, int page, int size) {
-        log.info("공지사항 작성자 검색 - admin: {}, page: {}, size: {}", adminId, page, size);
+    public Page<NoticeListResponseDto> searchNoticesByAdmin(String admin, int page, int size) {
+        log.info("공지사항 작성자 검색 - admin: {}, page: {}, size: {}", admin, page, size);
 
         Pageable pageable = PageRequest.of(page, size);
         Page<Notice> notices = noticeRepository
-                .findByIsActiveTrueAndAdminContainingIgnoreCaseOrderByCreatedAtDesc(adminId, pageable);
+                .findByIsActiveTrueAndAdminContainingIgnoreCaseOrderByCreatedAtDesc(admin, pageable);
 
         return notices.map(NoticeListResponseDto::from);
     }

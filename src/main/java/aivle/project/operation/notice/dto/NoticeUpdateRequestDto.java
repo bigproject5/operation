@@ -20,7 +20,7 @@ public class NoticeUpdateRequestDto {
     private Long id;
     private String title;
     private String content;
-    private String author;
+    private String admin;
     private Integer viewCount;
     private Boolean isActive;
     private LocalDateTime createdAt;
@@ -32,7 +32,7 @@ public class NoticeUpdateRequestDto {
                 .id(notice.getId())
                 .title(notice.getTitle())
                 .content(notice.getContent())
-                .author(notice.getAdmin())
+                .admin(notice.getAdmin())
                 .viewCount(notice.getViewCount())
                 .isActive(notice.getIsActive())
                 .createdAt(notice.getCreatedAt())
