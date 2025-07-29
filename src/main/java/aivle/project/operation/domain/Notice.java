@@ -35,6 +35,9 @@ public class Notice {
     @Column(nullable = false, length = 50)
     private String name;
 
+    @Column(nullable = false, length = 50)
+    private String fileUrl;
+
     @Column(nullable = false)
     @Builder.Default
     private Integer viewCount = 0;

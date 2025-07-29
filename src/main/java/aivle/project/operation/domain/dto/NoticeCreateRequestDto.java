@@ -22,6 +22,7 @@ public class NoticeCreateRequestDto {
     @NotBlank(message = "내용은 필수입니다.")
     private String content;
 
+    private String fileUrl;
 
 
     // DTO to Entity 변환 메서드
@@ -29,6 +30,7 @@ public class NoticeCreateRequestDto {
         return Notice.builder()
                 .title(this.title)
                 .content(this.content)
+                .fileUrl(this.fileUrl)
                 .name(name)
                 .adminId(adminId)
                 .build();

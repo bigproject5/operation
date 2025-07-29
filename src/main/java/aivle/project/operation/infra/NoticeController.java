@@ -58,11 +58,12 @@ public class NoticeController {
      */
     @PostMapping
     public ResponseEntity<NoticeDetailResponseDto> createNotice(
-            @RequestHeader("Admin") String adminId,
-            @RequestHeader("Name") String name,
+
+            @RequestHeader("X-User-Id") String adminId,
+            @RequestHeader("X-User-Name") String name,
             @Valid @RequestBody NoticeCreateRequestDto requestDto) {
 
-        log.info("POST /api/notices - title: {}", requestDto.getTitle());
+        log.info("POST /api/notices - title: {}, fileUrl: {}", requestDto.getTitle(), requestDto.getFileUrl());
 
         NoticeDetailResponseDto createdNotice = noticeService.createNotice(requestDto, Long.valueOf(adminId), name);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdNotice);

@@ -22,6 +22,7 @@ public class NoticeUpdateRequestDto {
     private String content;
     private Long adminId;
     private String name;
+    private String fileUrl;
     private Integer viewCount;
     private Boolean isActive;
     private LocalDateTime createdAt;
@@ -35,6 +36,7 @@ public class NoticeUpdateRequestDto {
                 .content(notice.getContent())
                 .adminId(notice.getAdminId())
                 .name(notice.getName())
+                .fileUrl(notice.getFileUrl())
                 .viewCount(notice.getViewCount())
                 .isActive(notice.getIsActive())
                 .createdAt(notice.getCreatedAt())

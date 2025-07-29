@@ -17,6 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -57,9 +60,10 @@ public class NoticeService {
      * 공지사항 생성
      */
     @Transactional
-    public NoticeDetailResponseDto createNotice(NoticeCreateRequestDto requestDto, Long adminId, String name) {
+    public NoticeDetailResponseDto createNotice(NoticeCreateRequestDto requestDto, Long adminId, String encodedName) {
         log.info("공지사항 생성 - title: {}", requestDto.getTitle());
 
+        String name = URLDecoder.decode(encodedName, StandardCharsets.UTF_8);
         Notice notice = requestDto.toEntity(adminId, name);
         Notice savedNotice = noticeRepository.save(notice);
 
@@ -104,7 +108,7 @@ public class NoticeService {
 
         Pageable pageable = PageRequest.of(page, size);
         Page<Notice> notices = noticeRepository
-                .findByIsActiveTrueAndAdminContainingIgnoreCaseOrderByCreatedAtDesc(adminId, pageable);
+                .findByIsActiveTrueAndAdminIdContainingIgnoreCaseOrderByCreatedAtDesc(adminId, pageable);
 
         return notices.map(NoticeListResponseDto::from);
     }

@@ -22,7 +22,7 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
             String title, Pageable pageable);
 
     // 작성자로 검색 (활성화된 공지사항만)
-    Page<Notice> findByIsActiveTrueAndAdminContainingIgnoreCaseOrderByCreatedAtDesc(
+    Page<Notice> findByIsActiveTrueAndAdminIdContainingIgnoreCaseOrderByCreatedAtDesc(
             String adminId, Pageable pageable);
 
     // 조회수 기준 인기 공지사항 조회

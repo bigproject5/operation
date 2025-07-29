@@ -87,20 +87,6 @@ public class GlobalExceptionHandler {
                         "message", ex.getMessage()
                 ));
     }
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
-        String errorMessage = ex.getBindingResult().getFieldErrors().stream()
-                .map(error -> error.getDefaultMessage())
-                .findFirst()
-                .orElse("Invalid input");
-
-        return  ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(Map.of(
-                        "error", "Bad Request",
-                        "message", errorMessage
-                ));
-    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException ex) {
@@ -118,16 +104,6 @@ public class GlobalExceptionHandler {
                 .body(Map.of(
                         "error", "Bad Request",
                         "message", "Request body is missing or malformed."
-                ));
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(Exception ex) {
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of(
-                        "error", "Internal Server Error",
-                        "message", ex.getMessage()
                 ));
     }
 
