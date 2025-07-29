@@ -1,7 +1,7 @@
-package aivle.project.operation.notice.dto;
+package aivle.project.operation.domain.dto;
 
 
-import aivle.project.operation.notice.entity.Notice;
+import aivle.project.operation.domain.Notice;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;

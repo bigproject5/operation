@@ -1,6 +1,5 @@
-package aivle.project.operation.notice.repository;
+package aivle.project.operation.domain;
 
-import aivle.project.operation.notice.entity.Notice;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

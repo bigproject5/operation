@@ -1,4 +1,4 @@
-package aivle.project.operation.notice.entity;
+package aivle.project.operation.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,13 +1,13 @@
-package aivle.project.operation.notice.service;
+package aivle.project.operation.service;
 
 // 필수 Import 문들 (모두 추가 필요)
-import aivle.project.operation.notice.dto.NoticeDetailResponseDto;
-import aivle.project.operation.notice.dto.NoticeListResponseDto;
-import aivle.project.operation.notice.dto.NoticeCreateRequestDto;
-import aivle.project.operation.notice.dto.NoticeUpdateRequestDto;
-import aivle.project.operation.notice.entity.Notice;
-import aivle.project.operation.notice.repository.NoticeRepository;
-import aivle.project.operation.notice.exception.NoticeNotFoundException;
+import aivle.project.operation.domain.dto.NoticeDetailResponseDto;
+import aivle.project.operation.domain.dto.NoticeListResponseDto;
+import aivle.project.operation.domain.dto.NoticeCreateRequestDto;
+import aivle.project.operation.domain.dto.NoticeUpdateRequestDto;
+import aivle.project.operation.domain.Notice;
+import aivle.project.operation.domain.NoticeRepository;
+import aivle.project.operation.infra.NoticeNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

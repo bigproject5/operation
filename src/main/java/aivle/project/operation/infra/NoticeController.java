@@ -1,6 +1,6 @@
-package aivle.project.operation.notice.controller;
+package aivle.project.operation.infra;
 
-import aivle.project.operation.notice.dto.NoticeUpdateRequestDto;
+import aivle.project.operation.domain.dto.NoticeUpdateRequestDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,14 +10,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 // 프로젝트 클래스들 import
-import aivle.project.operation.notice.dto.NoticeListResponseDto;
-import aivle.project.operation.notice.dto.NoticeCreateRequestDto;
-import aivle.project.operation.notice.service.NoticeService;
-import aivle.project.operation.notice.dto.NoticeDetailResponseDto;
+import aivle.project.operation.domain.dto.NoticeListResponseDto;
+import aivle.project.operation.domain.dto.NoticeCreateRequestDto;
+import aivle.project.operation.service.NoticeService;
+import aivle.project.operation.domain.dto.NoticeDetailResponseDto;
 
 
 @RestController
-@RequestMapping("/api/notices")
+@RequestMapping("/api/operation/notices")
 @RequiredArgsConstructor
 @Slf4j
 @CrossOrigin(origins = "*") // 개발 환경용, 운영 시 특정 도메인으로 제한
