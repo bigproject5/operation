@@ -16,11 +16,13 @@ public class NoticeDetailResponseDto {
     private Long id;
     private String title;
     private String content;
-    private String admin;
+    private Long adminId;
+    private String name;
     private Integer viewCount;
     private Boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
 
     // Entity to DTO 변환 정적 메서드
     public static NoticeDetailResponseDto from(Notice notice) {
@@ -28,7 +30,8 @@ public class NoticeDetailResponseDto {
                 .id(notice.getId())
                 .title(notice.getTitle())
                 .content(notice.getContent())
-                .admin(notice.getAdmin())
+                .adminId(notice.getAdminId())
+                .name(notice.getName())
                 .viewCount(notice.getViewCount())
                 .isActive(notice.getIsActive())
                 .createdAt(notice.getCreatedAt())

@@ -22,16 +22,15 @@ public class NoticeCreateRequestDto {
     @NotBlank(message = "내용은 필수입니다.")
     private String content;
 
-    @NotBlank(message = "작성자는 필수입니다.")
-    @Size(max = 50, message = "작성자는 50자 이하여야 합니다.")
-    private String admin;
+
 
     // DTO to Entity 변환 메서드
-    public Notice toEntity() {
+    public Notice toEntity(Long adminId, String name) {
         return Notice.builder()
                 .title(this.title)
                 .content(this.content)
-                .admin(this.admin)
+                .name(name)
+                .adminId(adminId)
                 .build();
     }
 }

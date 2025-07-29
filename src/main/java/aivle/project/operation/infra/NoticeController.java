@@ -58,11 +58,13 @@ public class NoticeController {
      */
     @PostMapping
     public ResponseEntity<NoticeDetailResponseDto> createNotice(
+            @RequestHeader("Admin") String adminId,
+            @RequestHeader("Name") String name,
             @Valid @RequestBody NoticeCreateRequestDto requestDto) {
 
         log.info("POST /api/notices - title: {}", requestDto.getTitle());
 
-        NoticeDetailResponseDto createdNotice = noticeService.createNotice(requestDto);
+        NoticeDetailResponseDto createdNotice = noticeService.createNotice(requestDto, Long.valueOf(adminId), name);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdNotice);
     }
 
@@ -97,15 +99,15 @@ public class NoticeController {
 
     /**
      * 공지사항 작성자 검색 API
-     * GET /api/notices/search/admin?keyword=작성자&page=0&size=10
+     * GET /api/notices/search/adminId?keyword=작성자&page=0&size=10
      */
-    @GetMapping("/search/admin")
-    public ResponseEntity<Page<NoticeListResponseDto>> searchNoticesByAdmin(
+    @GetMapping("/search/adminId")
+    public ResponseEntity<Page<NoticeListResponseDto>> searchNoticesByAdminId(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        log.info("GET /api/notices/search/admin - keyword: {}, page: {}, size: {}", keyword, page, size);
+        log.info("GET /api/notices/search/adminId - keyword: {}, page: {}, size: {}", keyword, page, size);
 
         Page<NoticeListResponseDto> notices = noticeService.searchNoticesByAdmin(keyword, page, size);
         return ResponseEntity.ok(notices);

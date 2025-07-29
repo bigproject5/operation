@@ -57,10 +57,10 @@ public class NoticeService {
      * 공지사항 생성
      */
     @Transactional
-    public NoticeDetailResponseDto createNotice(NoticeCreateRequestDto requestDto) {
-        log.info("공지사항 생성 - title: {}, admin: {}", requestDto.getTitle(), requestDto.getAdmin());
+    public NoticeDetailResponseDto createNotice(NoticeCreateRequestDto requestDto, Long adminId, String name) {
+        log.info("공지사항 생성 - title: {}", requestDto.getTitle());
 
-        Notice notice = requestDto.toEntity();
+        Notice notice = requestDto.toEntity(adminId, name);
         Notice savedNotice = noticeRepository.save(notice);
 
         log.info("공지사항 생성 완료 - id: {}", savedNotice.getId());
@@ -99,12 +99,12 @@ public class NoticeService {
     /**
      * 작성자로 공지사항 검색
      */
-    public Page<NoticeListResponseDto> searchNoticesByAdmin(String admin, int page, int size) {
-        log.info("공지사항 작성자 검색 - admin: {}, page: {}, size: {}", admin, page, size);
+    public Page<NoticeListResponseDto> searchNoticesByAdmin(String adminId, int page, int size) {
+        log.info("공지사항 작성자 검색 - adminId: {}, page: {}, size: {}", adminId, page, size);
 
         Pageable pageable = PageRequest.of(page, size);
         Page<Notice> notices = noticeRepository
-                .findByIsActiveTrueAndAdminContainingIgnoreCaseOrderByCreatedAtDesc(admin, pageable);
+                .findByIsActiveTrueAndAdminContainingIgnoreCaseOrderByCreatedAtDesc(adminId, pageable);
 
         return notices.map(NoticeListResponseDto::from);
     }

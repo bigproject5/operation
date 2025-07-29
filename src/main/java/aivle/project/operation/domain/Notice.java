@@ -28,8 +28,12 @@ public class Notice {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    // 아이디
     @Column(nullable = false, length = 50)
-    private String admin;
+    private Long adminId;
+
+    @Column(nullable = false, length = 50)
+    private String name;
 
     @Column(nullable = false)
     @Builder.Default
