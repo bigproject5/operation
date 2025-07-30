@@ -7,7 +7,7 @@ import aivle.project.operation.domain.dto.NoticeCreateRequestDto;
 import aivle.project.operation.domain.dto.NoticeUpdateRequestDto;
 import aivle.project.operation.domain.Notice;
 import aivle.project.operation.domain.NoticeRepository;
-import aivle.project.operation.infra.NoticeNotFoundException;
+import aivle.project.operation.infra.exception.NoticeNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
