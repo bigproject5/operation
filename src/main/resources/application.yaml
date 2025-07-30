@@ -1,0 +1,18 @@
+server:
+  port: 8081
+
+jwt:
+  secretKey: Ag&h2NbdPUef#Ayuep@aif8klvSk!fsAdj3wnk&kaWnv#id0F
+  expiredMs: 3600000
+spring:
+  application:
+    name: operation
+  h2:
+    console:
+      enabled: true
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
