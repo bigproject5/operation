@@ -8,7 +8,7 @@ import aivle.project.operation.domain.dto.LoginRequestDto;
 import aivle.project.operation.domain.dto.LoginResponseDto;
 import aivle.project.operation.domain.dto.AdminSignupRequestDto;
 import aivle.project.operation.domain.dto.WorkerSignupRequestDto;
-import aivle.project.operation.infra.JwtUtil;
+import aivle.project.operation.infra.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;

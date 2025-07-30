@@ -1,4 +1,4 @@
-package aivle.project.operation.infra;
+package aivle.project.operation.infra.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

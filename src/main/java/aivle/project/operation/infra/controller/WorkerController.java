@@ -1,7 +1,7 @@
-package aivle.project.operation.worker.controller;
+package aivle.project.operation.infra.controller;
 
-import aivle.project.operation.worker.domain.Worker;
-import aivle.project.operation.worker.service.WorkerService;
+import aivle.project.operation.domain.Worker;
+import aivle.project.operation.service.WorkerService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

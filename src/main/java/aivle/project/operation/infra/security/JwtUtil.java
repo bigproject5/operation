@@ -1,4 +1,4 @@
-package aivle.project.operation.infra;
+package aivle.project.operation.infra.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

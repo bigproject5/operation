@@ -1,4 +1,4 @@
-package aivle.project.operation.infra;
+package aivle.project.operation.infra.controller;
 
 import aivle.project.operation.domain.dto.NoticeUpdateRequestDto;
 import jakarta.validation.Valid;

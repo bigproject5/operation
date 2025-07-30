@@ -1,7 +1,7 @@
-package aivle.project.operation.worker.service;
+package aivle.project.operation.service;
 
-import aivle.project.operation.worker.domain.Worker;
-import aivle.project.operation.worker.domain.WorkerRepository;
+import aivle.project.operation.domain.Worker;
+import aivle.project.operation.domain.WorkerRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
