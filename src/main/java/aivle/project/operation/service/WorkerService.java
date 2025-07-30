@@ -13,9 +13,9 @@ import java.util.List;
 public class WorkerService {
     private final WorkerRepository workerRepository;
 
-    public Worker registerWorker(Worker worker) {
-        return workerRepository.save(worker);
-    }
+//    public Worker registerWorker(Worker worker) {
+//        return workerRepository.save(worker);
+//    }
     public List<Worker> getAllWorks() {
         return workerRepository.findAll();
     }

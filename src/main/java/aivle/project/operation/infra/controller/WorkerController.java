@@ -16,11 +16,11 @@ public class WorkerController {
     private final WorkerService workerService;
 
     //작업자 등록
-    @PostMapping
-    public ResponseEntity<Worker> register(@RequestBody Worker worker) {
-        Worker savedWorker = workerService.registerWorker(worker);
-        return ResponseEntity.ok(savedWorker);
-    }
+//    @PostMapping
+//    public ResponseEntity<Worker> register(@RequestBody Worker worker) {
+//        Worker savedWorker = workerService.registerWorker(worker);
+//        return ResponseEntity.ok(savedWorker);
+//    }
     //전체 작업자 조회
     @GetMapping
     public ResponseEntity<List<Worker>> getAllWorkers() {

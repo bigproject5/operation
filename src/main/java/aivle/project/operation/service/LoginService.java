@@ -78,7 +78,6 @@ public class LoginService {
     }
 
     public LoginResponseDto workerLogin(LoginRequestDto requestDto){
-        //회원가입 구현 안되어있음
         Optional<Worker> checkLoginId = workerRepository.findByLoginId(requestDto.getLoginId());
         if (checkLoginId.isEmpty()) {
             throw new BadCredentialsException("ID or password is not correct");
