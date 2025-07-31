@@ -25,6 +25,8 @@ public class WorkerSignupRequestDto {
     @NotBlank(message = "Employee number must not be empty.")
     private String name;
 
+    private String taskType;
+
     private String email;
 
     private String phoneNumber;
@@ -34,16 +36,20 @@ public class WorkerSignupRequestDto {
 
     private String address;
 
+    private String profileImageUrl;
+
     public Worker toEntity(String password) {
         Worker worker = new Worker();
         LocalDate date = LocalDate.now();
         worker.setLoginId(loginId);
         worker.setPassword(password);
         worker.setName(name);
+        worker.setTaskType(taskType);
         worker.setEmail(email);
         worker.setPhoneNumber(phoneNumber);
         worker.setEmployeeNumber(employeeNumber);
         worker.setAddress(address);
+        worker.setProfileImageUrl(profileImageUrl);
         worker.setCreatedAt(date);
         return worker;
     }

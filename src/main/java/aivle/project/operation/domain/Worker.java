@@ -22,8 +22,10 @@ public class Worker {
     private String password;
     private String employeeNumber;
     private String name;
+    private String taskType;
     private String email;
     private String phoneNumber;
     private String address;
+    private String profileImageUrl;
     private LocalDate createdAt;
 }

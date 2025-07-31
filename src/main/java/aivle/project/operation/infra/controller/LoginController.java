@@ -21,13 +21,13 @@ public class LoginController {
         this.jwtUtil = jwtUtil;
     }
 
-    @PostMapping(value = "/admin")
+    @PostMapping(value = "/admin/signup")
     public ResponseEntity<SignupResponseDto> adminRegister(@RequestBody @Valid AdminSignupRequestDto adminSignupRequestDto){
         loginService.adminSignup(adminSignupRequestDto);
         return ResponseEntity.ok(new SignupResponseDto(adminSignupRequestDto));
     }
 
-    @PostMapping(value = "/worker")
+    @PostMapping(value = "/workers/signup")
     public ResponseEntity<SignupResponseDto> workerRegister(@RequestBody @Valid WorkerSignupRequestDto workerSignupRequestDto){
         loginService.workerSignup(workerSignupRequestDto);
         return ResponseEntity.ok(new SignupResponseDto(workerSignupRequestDto));
@@ -39,7 +39,7 @@ public class LoginController {
         return ResponseEntity.ok(response);
     }
     
-    @PostMapping(value = "/worker/login")
+    @PostMapping(value = "/workers/login")
     public ResponseEntity<LoginResponseDto> workerLogin(@RequestBody LoginRequestDto loginRequestDto){
         LoginResponseDto response = loginService.workerLogin(loginRequestDto);
         return ResponseEntity.ok(response);
@@ -71,7 +71,7 @@ public class LoginController {
         return ResponseEntity.ok(response);
     }
     //인가 테스트 - worker
-    @PostMapping(value = "/worker/test")
+    @PostMapping(value = "/workers/test")
     public ResponseEntity<ResponseDto> workerTokenTest(
             @RequestHeader("Authorization") String token,
             @RequestHeader("X-User-Id") String userId,

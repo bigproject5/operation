@@ -1,5 +1,6 @@
 package aivle.project.operation.domain.dto;
 
+import aivle.project.operation.domain.Worker;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -17,9 +18,10 @@ public class WorkerResponseDto {
     private String email;
     private String phoneNumber;
     private String address;
+    private String profileImageUrl;
     private LocalDate createdAt;
 
-    public static WorkerResponseDto fromEntity(aivle.project.operation.domain.Worker worker) {
+    public static WorkerResponseDto fromEntity(Worker worker) {
         return WorkerResponseDto.builder()
                 .workerId(worker.getWorkerId())
                 .loginId(worker.getLoginId())
@@ -28,6 +30,7 @@ public class WorkerResponseDto {
                 .email(worker.getEmail())
                 .phoneNumber(worker.getPhoneNumber())
                 .address(worker.getAddress())
+                .profileImageUrl(worker.getProfileImageUrl())
                 .createdAt(worker.getCreatedAt())
                 .build();
     }

@@ -1,6 +1,7 @@
 package aivle.project.operation.infra.controller;
 
 import aivle.project.operation.domain.Worker;
+import aivle.project.operation.domain.dto.RequestDto;
 import aivle.project.operation.service.WorkerService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import aivle.project.operation.domain.dto.WorkerRequestDto;
 import aivle.project.operation.domain.dto.WorkerResponseDto;
 
+import java.awt.print.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -66,5 +68,11 @@ public class WorkerController {
     public ResponseEntity<Void> deleteWorker(@PathVariable Long id) {
         workerService.deleteWorker(id);
         return ResponseEntity.noContent().build();
+    }
+
+    //작업기준으로 작업자 조회
+    @GetMapping("/task")
+    public ResponseEntity<List<WorkerResponseDto>> getAllWorkersByTask(@RequestBody String task) {
+        return ResponseEntity.ok(workerService.getAllWorkersByTask(task));
     }
 }
