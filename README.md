@@ -198,7 +198,7 @@ DELETE :8080/api/operation/workers/id
 
 - 작업 기준 작업자 조회
 ```
-GET :8080/api/operation/workers/task
+GET :8080/api/operation/workers/task?taskType="type"
 ```
 
 ### TODO
@@ -229,6 +229,13 @@ POST :8080/api/operation/notices
 - 공지 수정
 ```
 PUT :8080/api/operation/notices/id
+```
+```json
+{
+  "title": "title",
+  "content": "content",
+  "fileUrl": "fileUrl"
+}
 ```
 
 - 공지 제목 검색

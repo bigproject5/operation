@@ -15,6 +15,7 @@ public class WorkerResponseDto {
     private String loginId;
     private String employeeNumber;
     private String name;
+    private String taskType;
     private String email;
     private String phoneNumber;
     private String address;
@@ -27,6 +28,7 @@ public class WorkerResponseDto {
                 .loginId(worker.getLoginId())
                 .employeeNumber(worker.getEmployeeNumber())
                 .name(worker.getName())
+                .taskType(worker.getTaskType())
                 .email(worker.getEmail())
                 .phoneNumber(worker.getPhoneNumber())
                 .address(worker.getAddress())

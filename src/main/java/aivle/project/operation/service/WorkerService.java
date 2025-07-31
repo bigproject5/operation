@@ -34,8 +34,8 @@ public class WorkerService {
         workerRepository.deleteById(id);
     }
 
-    public List<WorkerResponseDto> getAllWorkersByTask(String task) {
-        List<Worker> workers = workerRepository.findAllByTaskType(task);
+    public List<WorkerResponseDto> getAllWorkersByTask(String taskType) {
+        List<Worker> workers = workerRepository.findAllByTaskType(taskType);
         return workers.stream()
                 .map(WorkerResponseDto::fromEntity)
                 .toList();

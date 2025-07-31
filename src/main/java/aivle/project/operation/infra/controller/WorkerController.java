@@ -72,7 +72,7 @@ public class WorkerController {
 
     //작업기준으로 작업자 조회
     @GetMapping("/task")
-    public ResponseEntity<List<WorkerResponseDto>> getAllWorkersByTask(@RequestBody String task) {
-        return ResponseEntity.ok(workerService.getAllWorkersByTask(task));
+    public ResponseEntity<List<WorkerResponseDto>> getAllWorkersByTask(@RequestParam String taskType) {
+        return ResponseEntity.ok(workerService.getAllWorkersByTask(taskType));
     }
 }
