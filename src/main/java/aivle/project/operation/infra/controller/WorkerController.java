@@ -52,6 +52,15 @@ public class WorkerController {
         return ResponseEntity.ok(WorkerResponseDto.fromEntity(worker));
     }
 
+    @GetMapping("/profile")
+    public ResponseEntity<WorkerResponseDto> getWorkerByToken(
+            @RequestHeader("X-User-Id") String userId
+    ) {
+        Long Id = Long.parseLong(userId);
+        Worker worker = workerService.getWorkerById(Id);
+        return ResponseEntity.ok(WorkerResponseDto.fromEntity(worker));
+    }
+
     // 작업자 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteWorker(@PathVariable Long id) {
