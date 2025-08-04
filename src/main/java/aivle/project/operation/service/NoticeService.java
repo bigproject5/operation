@@ -16,9 +16,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -138,4 +145,27 @@ public class NoticeService {
         notice.deactivate();
         log.info("공지사항 삭제 완료 - id: {}", id);
     }
+
+    public String uploadFile(MultipartFile file) {
+        String uploadPath = System.getProperty("user.dir") + "/uploads/";
+
+        try {
+            // 파일명 중복 방지를 위한 UUID 추가
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path filePath = Paths.get(uploadPath, fileName);
+
+            // 디렉토리 생성
+            Files.createDirectories(filePath.getParent());
+
+            // 파일 저장
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // 파일 URL 반환 (실제 서비스에서는 CDN URL 등을 반환)
+            return "/files/" + fileName;
+
+        } catch (IOException e) {
+            throw new RuntimeException("파일 업로드 실패", e);
+        }
+    }
+
 }

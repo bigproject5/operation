@@ -14,6 +14,7 @@ import aivle.project.operation.domain.dto.NoticeListResponseDto;
 import aivle.project.operation.domain.dto.NoticeCreateRequestDto;
 import aivle.project.operation.service.NoticeService;
 import aivle.project.operation.domain.dto.NoticeDetailResponseDto;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
@@ -58,14 +59,17 @@ public class NoticeController {
      */
     @PostMapping
     public ResponseEntity<NoticeDetailResponseDto> createNotice(
-
             @RequestHeader("X-User-Id") String adminId,
             @RequestHeader("X-User-Name") String name,
-            @Valid @RequestBody NoticeCreateRequestDto requestDto) {
+            @RequestPart("file") MultipartFile file,
+            @RequestPart("notice") @Valid NoticeCreateRequestDto requestDto
+    ) {
 
-        log.info("POST /api/notices - title: {}, fileUrl: {}", requestDto.getTitle(), requestDto.getFileUrl());
+        log.info("POST /api/operation/notices - title: {}, fileUrl: {}", requestDto.getTitle(), requestDto.getFileUrl());
 
         NoticeDetailResponseDto createdNotice = noticeService.createNotice(requestDto, Long.valueOf(adminId), name);
+
+
         return ResponseEntity.status(HttpStatus.CREATED).body(createdNotice);
     }
 
