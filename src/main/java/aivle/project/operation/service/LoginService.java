@@ -4,10 +4,7 @@ import aivle.project.operation.domain.Admin;
 import aivle.project.operation.domain.AdminRepository;
 import aivle.project.operation.domain.Worker;
 import aivle.project.operation.domain.WorkerRepository;
-import aivle.project.operation.domain.dto.LoginRequestDto;
-import aivle.project.operation.domain.dto.LoginResponseDto;
-import aivle.project.operation.domain.dto.AdminSignupRequestDto;
-import aivle.project.operation.domain.dto.WorkerSignupRequestDto;
+import aivle.project.operation.domain.dto.*;
 import aivle.project.operation.infra.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -72,8 +69,13 @@ public class LoginService {
         String token = jwtUtil.createToken("ADMIN", admin.getAdminId(), admin.getName());
         LoginResponseDto response = new LoginResponseDto();
         response.setToken(token);
-        response.setRole("ADMIN");
         response.setExpiresIn(expirationTime / 1000); // 초단위
+        UserDto user = new UserDto();
+        user.setId(admin.getAdminId());
+        user.setName(admin.getName());
+        user.setRole("ADMIN");
+        response.setUser(user);
+
         return response;
     }
 
@@ -91,10 +93,17 @@ public class LoginService {
         String token = jwtUtil.createToken("WORKER", worker.getWorkerId(), worker.getName());
         LoginResponseDto response = new LoginResponseDto();
         response.setToken(token);
-        response.setRole("WORKER");
         response.setExpiresIn(expirationTime / 1000); // 초
+        UserDto user = new UserDto();
+        user.setId(worker.getWorkerId());
+        user.setName(worker.getName());
+        user.setRole("WORKER");
+        response.setUser(user);
+
         return response;
     }
+
+
 
     public UserDetails loadUserByAdminId(Long userId) throws UsernameNotFoundException {
         Admin admin = adminRepository.findByAdminId(userId)
@@ -117,5 +126,7 @@ public class LoginService {
                 .authorities("ROLE_WORKER")
                 .build();
     }
+
+
 
 }

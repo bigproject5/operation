@@ -45,6 +45,18 @@ public class LoginController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> me(
+            @RequestHeader("X-User-Id") String userId,
+            @RequestHeader("X-User-Role") String role,
+            @RequestHeader("X-User-Name") String name
+    ){
+        UserDto user = new  UserDto();
+        user.setId(Long.parseLong(userId));
+        user.setRole(role);
+        user.setName(name);
+        return  ResponseEntity.ok(user);
+    }
     //인가 테스트 - admin
     @PostMapping(value = "/admin/test")
     public ResponseEntity<ResponseDto> tokenTest(

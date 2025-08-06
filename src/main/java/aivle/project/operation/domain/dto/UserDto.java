@@ -5,8 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class LoginResponseDto {
-    private String token;
-    private Long expiresIn;
-    UserDto user;
+public class UserDto {
+    private Long id;
+    private String name;
+    private String role;
 }
