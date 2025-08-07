@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/operation/notices")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*") // 개발 환경용, 운영 시 특정 도메인으로 제한
+//@CrossOrigin(origins = "*") // 개발 환경용, 운영 시 특정 도메인으로 제한
 public class NoticeController {
 
     private final NoticeService noticeService; // public → private 수정
@@ -61,11 +61,20 @@ public class NoticeController {
     public ResponseEntity<NoticeDetailResponseDto> createNotice(
             @RequestHeader("X-User-Id") String adminId,
             @RequestHeader("X-User-Name") String name,
-            @RequestPart("file") MultipartFile file,
+            @RequestPart(value = "file", required = false) MultipartFile file,
             @RequestPart("notice") @Valid NoticeCreateRequestDto requestDto
     ) {
 
-        log.info("POST /api/operation/notices - title: {}, fileUrl: {}", requestDto.getTitle(), requestDto.getFileUrl());
+        log.info("POST /api/operation/notices - title: {}, adminId: {}, name: {}",
+                requestDto.getTitle(), adminId, name);
+
+        // 파일 정보 로그 출력
+        if (file != null && !file.isEmpty()) {
+            log.info("파일 첨부됨 - 파일명: {}, 크기: {} bytes, 타입: {}",
+                    file.getOriginalFilename(), file.getSize(), file.getContentType());
+        } else {
+            log.info("파일 첨부되지 않음");
+        }
 
         NoticeDetailResponseDto createdNotice = noticeService.createNotice(requestDto, Long.valueOf(adminId), name);
 
