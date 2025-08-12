@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "notices")
@@ -54,6 +55,10 @@ public class Notice {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<AttachedFile> attachedFiles = new ArrayList<>();
+
     // 조회수 증가 메서드
     public void increaseViewCount() {
         this.viewCount++;
@@ -68,5 +73,15 @@ public class Notice {
     // 공지사항 비활성화 메서드
     public void deactivate() {
         this.isActive = false;
+    }
+
+    public void addFile(AttachedFile file) {
+        attachedFiles.add(file);
+        file.setNotice(this);
+    }
+
+    public void removeFile(AttachedFile file) {
+        attachedFiles.remove(file);
+        file.setNotice(null);
     }
 }

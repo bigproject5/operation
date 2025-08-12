@@ -1,6 +1,7 @@
 package aivle.project.operation.service;
 
 // 필수 Import 문들 (모두 추가 필요)
+import aivle.project.operation.domain.AttachedFile;
 import aivle.project.operation.domain.dto.NoticeDetailResponseDto;
 import aivle.project.operation.domain.dto.NoticeListResponseDto;
 import aivle.project.operation.domain.dto.NoticeCreateRequestDto;
@@ -17,9 +18,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -138,5 +142,29 @@ public class NoticeService {
 
         notice.deactivate();
         log.info("공지사항 삭제 완료 - id: {}", id);
+    }
+
+    /**
+     * 기존 공지사항에 파일들 업로드
+     */
+    @Transactional
+    public List<AttachedFile> uploadFilesToNotice(Long noticeId, List<MultipartFile> files) {
+        log.info("공지사항에 파일 업로드 - noticeId: {}, files count: {}", noticeId, files.size());
+
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new NoticeNotFoundException("공지사항을 찾을 수 없습니다. ID: " + noticeId));
+
+        List<AttachedFile> uploadedFiles = new ArrayList<>();
+
+        for (MultipartFile file : files) {
+            if (!file.isEmpty()) {
+                AttachedFile uploadedFile = fileUploadService.uploadFile(file, notice);
+                uploadedFiles.add(uploadedFile);
+                notice.addFile(uploadedFile);
+            }
+        }
+
+        log.info("파일 업로드 완료 - noticeId: {}, uploaded count: {}", noticeId, uploadedFiles.size());
+        return uploadedFiles;
     }
 }
