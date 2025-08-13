@@ -158,6 +158,7 @@ public class NoticeService {
 
         for (MultipartFile file : files) {
             if (!file.isEmpty()) {
+                FileUploadService fileUploadService = null;
                 AttachedFile uploadedFile = fileUploadService.uploadFile(file, notice);
                 uploadedFiles.add(uploadedFile);
                 notice.addFile(uploadedFile);
