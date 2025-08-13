@@ -128,6 +128,19 @@ public class LoginService {
         return response;
     }
 
+    public LoginResponseDto devLogin(){
+        String token = jwtUtil.createToken("DEV", 1L, "develop");
+        LoginResponseDto response = new LoginResponseDto();
+        response.setToken(token);
+        response.setExpiresIn(expirationTime / 1000); // 초
+        UserDto user = new UserDto();
+        user.setId(1L);
+        user.setName("develop");
+        user.setRole("DEV");
+        response.setUser(user);
+
+        return response;
+    }
 
 
     public UserDetails loadUserByAdminId(Long userId) throws UsernameNotFoundException {
@@ -143,7 +156,7 @@ public class LoginService {
 
     public UserDetails loadUserByWorkerId(Long userId) throws UsernameNotFoundException {
         Worker worker = workerRepository.findByWorkerId(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("Admin not found: " + userId));
+                .orElseThrow(() -> new UsernameNotFoundException("Worker not found: " + userId));
 
         return User.builder()
                 .username(worker.getLoginId())

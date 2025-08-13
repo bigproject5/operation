@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -27,7 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         //토큰 파싱
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String userId =request.getHeader("X-User-Id");
+        String userId = request.getHeader("X-User-Id");
         String role = request.getHeader("X-User-Role");
 
         //토큰이 없거나 형식이 맞지 않으면 다음 필터로 넘김
@@ -51,12 +52,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * TODO: 개발용 함수, 추후 변경 필요
+     */
     private UserDetails getUserDetails(Long userId, String role) {
         if(role.equals("ADMIN")){
             return loginService.loadUserByAdminId(userId);
         }
         else if(role.equals("WORKER")){
             return loginService.loadUserByWorkerId(userId);
+        }
+        //개발용
+        else if (role.equals("DEV")) {
+            return User.builder()
+                    .username("developer")
+                    .password("developer_password")
+                    .authorities("ROLE_WORKER")
+                    .build();
         }
         throw new IllegalArgumentException("Invalid role");
     }

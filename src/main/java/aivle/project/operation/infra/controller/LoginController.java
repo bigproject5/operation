@@ -56,17 +56,26 @@ public class LoginController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * TODO: 개발용 함수, 추후 제거 필요
+     */
+    @PostMapping(value = "/dev/login")
+    public ResponseEntity<LoginResponseDto> DevLogin(){
+        LoginResponseDto response = loginService.devLogin();
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/me")
     public ResponseEntity<UserDto> me(
             @RequestHeader("X-User-Id") String userId,
             @RequestHeader("X-User-Role") String role,
             @RequestHeader("X-User-Name") String name
     ){
-        UserDto user = new  UserDto();
+        UserDto user = new UserDto();
         user.setId(Long.parseLong(userId));
         user.setRole(role);
         user.setName(name);
-        return  ResponseEntity.ok(user);
+        return ResponseEntity.ok(user);
     }
     //인가 테스트 - admin
     @PostMapping(value = "/admin/test")
