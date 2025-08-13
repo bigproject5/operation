@@ -1,6 +1,9 @@
 server:
   port: 8081
 
+reCaptcha:
+  secretKey: #reCaptcha secret key
+
 jwt:
   secretKey: Ag&h2NbdPUef#Ayuep@aif8klvSk!fsAdj3wnk&kaWnv#id0F
   expiredMs: 3600000

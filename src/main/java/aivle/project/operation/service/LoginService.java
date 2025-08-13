@@ -5,9 +5,12 @@ import aivle.project.operation.domain.AdminRepository;
 import aivle.project.operation.domain.Worker;
 import aivle.project.operation.domain.WorkerRepository;
 import aivle.project.operation.domain.dto.*;
+import aivle.project.operation.infra.exception.CaptchaFailedException;
 import aivle.project.operation.infra.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +18,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 
@@ -30,17 +36,36 @@ public class LoginService {
     @Value("${jwt.expiredMs}")
     private Long expirationTime;
 
+    @Value("${reCaptcha.secretKey}")
+    private String reCaptchaSecret;
+
     @Transactional
-    public void adminSignup(AdminSignupRequestDto requestDto) {
+    public SignupResponseDto adminSignup(AdminSignupRequestDto requestDto) {
         Optional<Admin> checkLoginId = adminRepository.findByLoginId(requestDto.getLoginId());
         if (checkLoginId.isPresent()) {
             throw new IllegalArgumentException("This ID already exists.");
+        }
+
+        String verifyUrl = "https://www.google.com/recaptcha/api/siteverify";
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("secret", reCaptchaSecret); // 서버 전용
+        params.add("response", requestDto.getReCaptchaToken());
+
+        RestTemplate restTemplate = new RestTemplate();
+        RecaptchaResponse recaptchaResponse =
+                restTemplate.postForObject(verifyUrl, params, RecaptchaResponse.class);
+
+        assert recaptchaResponse != null;
+        if (!recaptchaResponse.isSuccess() || recaptchaResponse.getScore() < 0.5) {
+            throw new CaptchaFailedException("Captcha failed");
         }
 
         String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
 
         Admin admin = requestDto.toEntity(encodedPassword);
         adminRepository.save(admin);
+        return new SignupResponseDto(requestDto);
     }
 
     @Transactional
