@@ -38,7 +38,7 @@ public class AdminSignupRequestDto {
     @NotBlank(message = "admin code must not be empty.")
     private String adminCode;
 
-    @NotBlank
+//    @NotBlank
     private String reCaptchaToken;
 
     public Admin toEntity(String encodedPassword) {
