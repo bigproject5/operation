@@ -66,7 +66,7 @@ public class LoginService {
         if(!passwordEncoder.matches(requestDto.getPassword(), admin.getPassword())){
             throw new BadCredentialsException("ID or password is not correct");
         }
-        String token = jwtUtil.createToken("ADMIN", admin.getAdminId(), admin.getName());
+        String token = jwtUtil.createToken("ADMIN", admin.getAdminId(), admin.getName(), "ADMIN");
         LoginResponseDto response = new LoginResponseDto();
         response.setToken(token);
         response.setExpiresIn(expirationTime / 1000); // 초단위
@@ -90,7 +90,7 @@ public class LoginService {
             throw new BadCredentialsException("ID or password is not correct");
         }
 
-        String token = jwtUtil.createToken("WORKER", worker.getWorkerId(), worker.getName());
+        String token = jwtUtil.createToken("WORKER", worker.getWorkerId(), worker.getName(), worker.getTaskType());
         LoginResponseDto response = new LoginResponseDto();
         response.setToken(token);
         response.setExpiresIn(expirationTime / 1000); // 초
