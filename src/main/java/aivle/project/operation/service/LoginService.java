@@ -74,6 +74,7 @@ public class LoginService {
         user.setId(admin.getAdminId());
         user.setName(admin.getName());
         user.setRole("ADMIN");
+        user.setTaskType("ADMIN");
         response.setUser(user);
 
         return response;
@@ -98,6 +99,7 @@ public class LoginService {
         user.setId(worker.getWorkerId());
         user.setName(worker.getName());
         user.setRole("WORKER");
+        user.setTaskType(worker.getTaskType());
         response.setUser(user);
 
         return response;
