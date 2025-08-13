@@ -39,11 +39,12 @@ public class JwtUtil {
         return true;
     }
 
-    public String createToken(String role, Long id, String name){
+    public String createToken(String role, Long id, String name, String taskType) {
         Claims claims = Jwts.claims();
         claims.put("role", role);
         claims.put("id", id);
         claims.put("name", name);
+        claims.put("taskType", taskType);
 
         return Jwts.builder()
                 .setClaims(claims)
