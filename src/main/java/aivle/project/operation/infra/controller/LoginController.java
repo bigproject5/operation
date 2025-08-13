@@ -70,7 +70,7 @@ public class LoginController {
             @RequestHeader("X-User-Id") String userId,
             @RequestHeader("X-User-Role") String role,
             @RequestHeader("X-User-Name") String name,
-            @RequestHeader("X-User-Task-Type") String taskType
+            @RequestHeader(value = "X-User-Task-Type", required = false) String taskType
     ){
         UserDto user = new UserDto();
         user.setId(Long.parseLong(userId));
