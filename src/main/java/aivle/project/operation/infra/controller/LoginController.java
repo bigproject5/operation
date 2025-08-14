@@ -56,6 +56,12 @@ public class LoginController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/admin/check-id")
+    public ResponseEntity<AdminLoginIdCheckResponseDto>checkIdAvailability (@RequestBody AdminLoginIdCheckRequestDto loginId){
+        AdminLoginIdCheckResponseDto response = loginService.CheckAdminLoginIdAvailable(loginId);
+        return ResponseEntity.ok(response);
+    }
+
     /**
      * TODO: 개발용 함수, 추후 제거 필요
      */

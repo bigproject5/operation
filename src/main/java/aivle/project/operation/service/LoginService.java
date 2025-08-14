@@ -9,8 +9,6 @@ import aivle.project.operation.infra.exception.CaptchaFailedException;
 import aivle.project.operation.infra.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -130,6 +128,22 @@ public class LoginService {
         return response;
     }
 
+    public AdminLoginIdCheckResponseDto CheckAdminLoginIdAvailable(AdminLoginIdCheckRequestDto loginIdDto){
+        Optional<Admin> admin = adminRepository.findByLoginId(loginIdDto.getLoginId());
+        AdminLoginIdCheckResponseDto response = new AdminLoginIdCheckResponseDto();
+        if (admin.isPresent()) {
+            return response
+                    .setAvailable(false)
+                    .setMessage("This ID already exists.");
+        }
+        return response
+                .setAvailable(true)
+                .setMessage("This ID is available.");
+
+    }
+
+
+    // 개발용 코드
     public LoginResponseDto devLogin(){
         String token = jwtUtil.createToken("DEV", 1L, "develop", "dev");
         LoginResponseDto response = new LoginResponseDto();
