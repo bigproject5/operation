@@ -67,7 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return User.builder()
                     .username("developer")
                     .password("developer_password")
-                    .authorities("ROLE_WORKER")
+                    .authorities("ROLE_DEV")
                     .build();
         }
         throw new IllegalArgumentException("Invalid role");
