@@ -179,4 +179,99 @@ public class FileUploadService {
             throw new RuntimeException("파일 다운로드 중 오류가 발생했습니다.", e);
         }
     }
+
+    /**
+     * 개별 파일 삭제
+     */
+    @Transactional
+    public void deleteFile(Long fileId) {
+        log.info("파일 삭제 시작 - fileId: {}", fileId);
+        
+        try {
+            // 1. DB에서 파일 정보 조회
+            AttachedFile fileInfo = attachedFileRepository.findById(fileId)
+                    .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다. ID: " + fileId));
+
+            // 2. 물리적 파일 삭제
+            String fullPath = fileUploadConfig.getUploadPath() + fileInfo.getFilePath();
+            File physicalFile = new File(fullPath);
+            
+            if (physicalFile.exists()) {
+                boolean deleted = physicalFile.delete();
+                if (!deleted) {
+                    log.warn("물리적 파일 삭제 실패: {}", fullPath);
+                } else {
+                    log.info("물리적 파일 삭제 완료: {}", fullPath);
+                }
+            } else {
+                log.warn("물리적 파일이 존재하지 않음: {}", fullPath);
+            }
+
+            // 3. DB에서 파일 정보 삭제
+            attachedFileRepository.delete(fileInfo);
+            
+            log.info("파일 삭제 완료 - fileId: {}, originalFileName: {}", fileId, fileInfo.getOriginalFileName());
+            
+        } catch (Exception e) {
+            log.error("파일 삭제 실패 - fileId: {}, error: {}", fileId, e.getMessage());
+            throw new RuntimeException("파일 삭제 중 오류가 발생했습니다.", e);
+        }
+    }
+
+    /**
+     * 공지사항에 속한 여러 파일들 삭제
+     */
+    @Transactional
+    public void deleteFiles(List<Long> fileIds) {
+        log.info("여러 파일 삭제 시작 - fileIds: {}", fileIds);
+        
+        if (fileIds == null || fileIds.isEmpty()) {
+            log.info("삭제할 파일이 없습니다.");
+            return;
+        }
+        
+        for (Long fileId : fileIds) {
+            try {
+                deleteFile(fileId);
+            } catch (Exception e) {
+                log.error("파일 삭제 실패 - fileId: {}, 계속 진행합니다.", fileId);
+                // 개별 파일 삭제 실패 시에도 다른 파일들은 계속 삭제 진행
+            }
+        }
+        
+        log.info("여러 파일 삭제 완료 - 요청된 파일 수: {}", fileIds.size());
+    }
+
+    /**
+     * 공지사항에 속한 모든 파일 삭제
+     */
+    @Transactional
+    public void deleteAllFilesByNotice(Notice notice) {
+        log.info("공지사항의 모든 파일 삭제 - noticeId: {}", notice.getId());
+        
+        List<AttachedFile> files = attachedFileRepository.findByNotice(notice);
+        
+        for (AttachedFile file : files) {
+            try {
+                // 물리적 파일 삭제
+                String fullPath = fileUploadConfig.getUploadPath() + file.getFilePath();
+                File physicalFile = new File(fullPath);
+                
+                if (physicalFile.exists()) {
+                    physicalFile.delete();
+                }
+                
+                // Notice와의 연관관계 해제
+                notice.removeFile(file);
+                
+            } catch (Exception e) {
+                log.error("파일 삭제 실패 - fileId: {}", file.getId());
+            }
+        }
+        
+        // DB에서 파일 정보들 삭제
+        attachedFileRepository.deleteAll(files);
+        
+        log.info("공지사항의 모든 파일 삭제 완료 - noticeId: {}, 삭제된 파일 수: {}", notice.getId(), files.size());
+    }
 }
