@@ -94,6 +94,57 @@ public class NoticeService {
     }
 
     /**
+     * 공지사항 수정 (파일 삭제 포함)
+     */
+    @Transactional
+    public NoticeDetailResponseDto updateNoticeWithFiles(Long noticeId, NoticeUpdateRequestDto updateDto) {
+        log.info("공지사항 수정 시작 - id: {}", noticeId);
+        
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new NoticeNotFoundException("해당 공지사항을 찾을 수 없습니다. ID: " + noticeId));
+
+        boolean hasChanges = false;
+
+        // 1. 필수 항목 검증 및 변경사항 확인 (제목, 내용)
+        if (updateDto.getTitle() == null || updateDto.getTitle().trim().isEmpty()) {
+            throw new IllegalArgumentException("제목은 필수입니다.");
+        }
+        if (updateDto.getContent() == null || updateDto.getContent().trim().isEmpty()) {
+            throw new IllegalArgumentException("내용은 필수입니다.");
+        }
+
+        // 2. 변경사항이 있는 경우에만 수정
+        if (!notice.getTitle().equals(updateDto.getTitle()) || 
+            !notice.getContent().equals(updateDto.getContent())) {
+            notice.update(updateDto.getTitle(), updateDto.getContent());
+            hasChanges = true;
+            log.info("공지사항 내용 변경 완료 - id: {}", notice.getId());
+        }
+
+        // 3. 첨부파일 삭제 처리 (선택 작업)
+        List<Long> deleteFileIds = updateDto.getDeleteFileIds();
+        if (deleteFileIds != null && !deleteFileIds.isEmpty()) {
+            try {
+                fileUploadService.deleteFiles(deleteFileIds);
+                hasChanges = true;
+                log.info("첨부파일 삭제 완료 - noticeId: {}, 삭제된 파일 수: {}", noticeId, deleteFileIds.size());
+            } catch (Exception e) {
+                log.warn("첨부파일 삭제 실패 - noticeId: {}, error: {}", noticeId, e.getMessage());
+            }
+        }
+
+        // 4. 변경사항이 있을 때만 저장
+        if (hasChanges) {
+            Notice savedNotice = noticeRepository.save(notice);
+            log.info("공지사항 저장 완료 - id: {}", savedNotice.getId());
+            return NoticeDetailResponseDto.from(savedNotice);
+        } else {
+            log.info("변경사항이 없어 저장하지 않음 - id: {}", noticeId);
+            return NoticeDetailResponseDto.from(notice);
+        }
+    }
+
+    /**
      * 제목으로 공지사항 검색
      */
     public Page<NoticeListResponseDto> searchNoticesByTitle(String title, int page, int size) {

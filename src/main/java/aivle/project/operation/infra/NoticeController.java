@@ -168,8 +168,8 @@ public class NoticeController {
         return ResponseEntity.ok("Notice Service is running!");
     }
 
-    // === 새로 추가: 파일 관련 API들 ===
 
+    // 파일 관련 API
     /**
      * 특정 공지사항의 첨부파일 목록 조회
      */
@@ -201,5 +201,56 @@ public class NoticeController {
         List<AttachedFile> uploadedFiles = noticeService.uploadFilesToNotice(noticeId, files);
         return ResponseEntity.ok(uploadedFiles);
     }
+
+    /**
+     * 개별 첨부파일 삭제
+     */
+    @DeleteMapping("/files/{fileId}")
+    public ResponseEntity<Void> deleteFile(@PathVariable Long fileId) {
+        log.info("DELETE /api/operation/notices/files/{}", fileId);
+        
+        try {
+            fileUploadService.deleteFile(fileId);
+            log.info("파일 삭제 완료 - fileId: {}", fileId);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            log.error("파일 삭제 실패 - fileId: {}, error: {}", fileId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * 공지사항 수정 (파일 삭제 포함)
+     */
+    @PutMapping("/{noticeId}/with-files")
+    public ResponseEntity<NoticeDetailResponseDto> updateNoticeWithFiles(
+            @PathVariable Long noticeId,
+            @RequestPart("notice") NoticeUpdateRequestDto updateDto,
+            @RequestPart(value = "files", required = false) List<MultipartFile> newFiles) {
+        
+        log.info("PUT /api/operation/notices/{}/with-files - deleteFileIds: {}, newFiles count: {}", 
+                noticeId, updateDto.getDeleteFileIds(), newFiles != null ? newFiles.size() : 0);
+        
+        try {
+            // 1. 공지사항 내용 수정 + 파일 삭제
+            NoticeDetailResponseDto updatedNotice = noticeService.updateNoticeWithFiles(noticeId, updateDto);
+            
+            // 2. 새 파일 업로드 (있는 경우)
+            if (newFiles != null && !newFiles.isEmpty()) {
+                noticeService.uploadFilesToNotice(noticeId, newFiles);
+            }
+            
+            return ResponseEntity.ok(updatedNotice);
+            
+        } catch (IllegalArgumentException e) {
+            log.error("잘못된 요청 - noticeId: {}, error: {}", noticeId, e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            log.error("공지사항 수정 실패 - noticeId: {}, error: {}", noticeId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
 
 }

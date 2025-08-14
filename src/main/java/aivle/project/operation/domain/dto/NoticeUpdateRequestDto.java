@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-
+import java.util.List;
 
 
 @Getter
@@ -27,6 +27,8 @@ public class NoticeUpdateRequestDto {
     private Boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    private List<Long> deleteFileIds;
 
     // Entity to DTO 변환 정적 메서드
     public static NoticeDetailResponseDto from(Notice notice) {
