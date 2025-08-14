@@ -32,6 +32,7 @@ import java.util.List;
 public class NoticeService {
 
     private final NoticeRepository noticeRepository;
+    private final FileUploadService fileUploadService;
 
     /**
      * 공지사항 목록 조회 (페이징)
@@ -158,7 +159,6 @@ public class NoticeService {
 
         for (MultipartFile file : files) {
             if (!file.isEmpty()) {
-                FileUploadService fileUploadService = null;
                 AttachedFile uploadedFile = fileUploadService.uploadFile(file, notice);
                 uploadedFiles.add(uploadedFile);
                 notice.addFile(uploadedFile);
