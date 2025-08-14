@@ -2,16 +2,21 @@ package aivle.project.operation.service;
 
 import aivle.project.operation.domain.Worker;
 import aivle.project.operation.domain.WorkerRepository;
+import aivle.project.operation.domain.dto.WorkerEditDto;
+import aivle.project.operation.domain.dto.WorkerRequestDto;
 import aivle.project.operation.domain.dto.WorkerResponseDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class WorkerService {
     private final WorkerRepository workerRepository;
 
@@ -39,5 +44,23 @@ public class WorkerService {
         return workers.stream()
                 .map(WorkerResponseDto::fromEntity)
                 .toList();
+    }
+
+    public WorkerResponseDto editWorker(WorkerEditDto workerEditDto) {
+        Optional<Worker> worker_ = workerRepository.findByWorkerId(workerEditDto.getWorkerId());
+        if(worker_.isEmpty()) {
+            throw new IllegalArgumentException("작업자를 찾을 수 없습니다");
+        }
+        Worker worker = worker_.get();
+        worker.setEmployeeNumber(workerEditDto.getEmployeeNumber());
+        worker.setAddress(workerEditDto.getAddress());
+        worker.setEmail(workerEditDto.getEmail());
+        worker.setTaskType(workerEditDto.getTaskType());
+        worker.setPhoneNumber(workerEditDto.getPhoneNumber());
+        worker.setName(workerEditDto.getName());
+        worker.setProfileImageUrl(workerEditDto.getProfileImageUrl());
+        workerRepository.save(worker);
+
+        return WorkerResponseDto.fromEntity(worker);
     }
 }

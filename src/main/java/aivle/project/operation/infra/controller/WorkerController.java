@@ -2,9 +2,11 @@ package aivle.project.operation.infra.controller;
 
 import aivle.project.operation.domain.Worker;
 import aivle.project.operation.domain.dto.RequestDto;
+import aivle.project.operation.domain.dto.WorkerEditDto;
 import aivle.project.operation.service.WorkerService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Fetch;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import aivle.project.operation.domain.dto.WorkerRequestDto;
@@ -52,6 +54,12 @@ public class WorkerController {
     public ResponseEntity<WorkerResponseDto> getWorkerById(@PathVariable Long id) {
         Worker worker = workerService.getWorkerById(id);
         return ResponseEntity.ok(WorkerResponseDto.fromEntity(worker));
+    }
+
+    @PatchMapping("/edit")
+    public ResponseEntity<WorkerResponseDto> editWorkerProfile(@RequestBody WorkerEditDto workerEditDto) {
+        WorkerResponseDto responseDto = workerService.editWorker(workerEditDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/profile")
