@@ -33,7 +33,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/operation/admin/test").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/operation/notices").permitAll()
-                        .requestMatchers("/api/operation/notices").access(new WebExpressionAuthorizationManager("hasRole('DEV') or hasRole('ADMIN')"))
+                        .requestMatchers("/api/operation/notices").hasAnyRole("ADMIN", "DEV")
                         .requestMatchers("/api/operation/worker/test").hasRole("WORKER")
                         .anyRequest().permitAll()
                 )
