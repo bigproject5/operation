@@ -29,6 +29,7 @@ public class NoticeDetailResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class UploadFileDto {
+        private Long fileId;
         private String fileName;
         private String savedName;
         private String fileUrl;
@@ -50,6 +51,7 @@ public class NoticeDetailResponseDto {
         dto.updatedAt = notice.getUpdatedAt();
 
         dto.files = notice.getFiles().stream().map(file -> new UploadFileDto(
+                file.getId(),
                 file.getFileName(),
                 file.getSavedName(),
                 file.getFileUrl(),

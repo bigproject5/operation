@@ -8,10 +8,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.core.io.Resource;
 // 프로젝트 클래스들 import
 import aivle.project.operation.domain.dto.NoticeListResponseDto;
 import aivle.project.operation.domain.dto.NoticeCreateRequestDto;
@@ -163,6 +165,24 @@ public class NoticeController {
         noticeService.deleteNotice(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/download/{fileId}")
+    public ResponseEntity<Resource> downloadFile(
+            @RequestHeader("X-User-Id") String userId,
+            @PathVariable Long fileId
+    ) {
+        Resource resource = fileService.downloadFile(fileId);
+        String contentType = fileService.getFileContentType(resource);
+
+        log.info("파일 다운로드 요청 사용자: {}, 파일: {}", userId, fileId);
+
+        String fileName = resource.getFilename();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(resource);
+    }
+
 
     /**
      * Health Check API

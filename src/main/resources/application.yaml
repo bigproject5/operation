@@ -8,6 +8,10 @@ jwt:
   secretKey: Ag&h2NbdPUef#Ayuep@aif8klvSk!fsAdj3wnk&kaWnv#id0F
   expiredMs: 3600000
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
   application:
     name: operation
   h2:
