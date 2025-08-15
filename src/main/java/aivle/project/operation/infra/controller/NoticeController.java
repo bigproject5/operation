@@ -1,6 +1,9 @@
 package aivle.project.operation.infra.controller;
 
+import aivle.project.operation.domain.NoticeRepository;
+import aivle.project.operation.domain.UploadFile;
 import aivle.project.operation.domain.dto.NoticeUpdateRequestDto;
+import aivle.project.operation.service.FileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +19,10 @@ import aivle.project.operation.service.NoticeService;
 import aivle.project.operation.domain.dto.NoticeDetailResponseDto;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/operation/notices")
@@ -25,7 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class NoticeController {
 
     private final NoticeService noticeService; // public → private 수정
-
+    private final FileService fileService;
     /**
      * 공지사항 목록 조회 API
      * GET /api/notices?page=0&size=10
@@ -61,23 +68,26 @@ public class NoticeController {
     public ResponseEntity<NoticeDetailResponseDto> createNotice(
             @RequestHeader("X-User-Id") String adminId,
             @RequestHeader("X-User-Name") String name,
-            @RequestPart(value = "file", required = false) MultipartFile file,
+            @RequestPart(value = "file", required = false) List<MultipartFile> files,
             @RequestPart("notice") @Valid NoticeCreateRequestDto requestDto
     ) {
 
         log.info("POST /api/operation/notices - title: {}, adminId: {}, name: {}",
                 requestDto.getTitle(), adminId, name);
 
+        List<UploadFile> fileList = new ArrayList<>();
+
+
         // 파일 정보 로그 출력
-        if (file != null && !file.isEmpty()) {
-            log.info("파일 첨부됨 - 파일명: {}, 크기: {} bytes, 타입: {}",
-                    file.getOriginalFilename(), file.getSize(), file.getContentType());
+        if (files != null && !files.isEmpty()) {
+            files.forEach(file -> log.info("파일 첨부됨 - 파일명: {}, 크기: {} bytes, 타입: {}",
+                    file.getOriginalFilename(), file.getSize(), file.getContentType()));
+
+            fileList = fileService.uploadFile(files);
         } else {
             log.info("파일 첨부되지 않음");
         }
-
-        NoticeDetailResponseDto createdNotice = noticeService.createNotice(requestDto, Long.valueOf(adminId), name);
-
+        NoticeDetailResponseDto createdNotice = noticeService.createNotice(requestDto, Long.valueOf(adminId), name, fileList);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createdNotice);
     }

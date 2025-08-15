@@ -1,12 +1,11 @@
 package aivle.project.operation.domain.dto;
 
 import aivle.project.operation.domain.Notice;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
@@ -18,12 +17,23 @@ public class NoticeDetailResponseDto {
     private String content;
     private Long adminId;
     private String name;
-    private String fileUrl;
     private Integer viewCount;
     private Boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    private List<UploadFileDto> files;
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UploadFileDto {
+        private String fileName;
+        private String savedName;
+        private String fileUrl;
+        private Long fileSize;
+    }
 
     // Entity to DTO 변환 정적 메서드
     public static NoticeDetailResponseDto from(Notice notice) {
@@ -33,11 +43,17 @@ public class NoticeDetailResponseDto {
                 .content(notice.getContent())
                 .adminId(notice.getAdminId())
                 .name(notice.getName())
-                .fileUrl(notice.getFileUrl())
                 .viewCount(notice.getViewCount())
                 .isActive(notice.getIsActive())
                 .createdAt(notice.getCreatedAt())
                 .updatedAt(notice.getUpdatedAt())
-                .build();
+                .files(notice.getFiles().stream()
+                        .map(uploadFile -> new UploadFileDto(
+                                uploadFile.getFileName(),
+                                uploadFile.getSavedName(),
+                                uploadFile.getFileUrl(),
+                                uploadFile.getFileSize()
+                        )).collect(Collectors.toList())
+                ).build();
     }
 }

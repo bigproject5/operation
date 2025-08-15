@@ -1,6 +1,8 @@
 package aivle.project.operation.service;
 
 // 필수 Import 문들 (모두 추가 필요)
+import aivle.project.operation.domain.UploadFile;
+import aivle.project.operation.domain.UploadFileRepository;
 import aivle.project.operation.domain.dto.NoticeDetailResponseDto;
 import aivle.project.operation.domain.dto.NoticeListResponseDto;
 import aivle.project.operation.domain.dto.NoticeCreateRequestDto;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -25,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -34,6 +38,7 @@ import java.util.UUID;
 public class NoticeService {
 
     private final NoticeRepository noticeRepository;
+    private final UploadFileRepository uploadFileRepository;
 
     /**
      * 공지사항 목록 조회 (페이징)
@@ -67,14 +72,22 @@ public class NoticeService {
      * 공지사항 생성
      */
     @Transactional
-    public NoticeDetailResponseDto createNotice(NoticeCreateRequestDto requestDto, Long adminId, String encodedName) {
+    public NoticeDetailResponseDto createNotice(
+            NoticeCreateRequestDto requestDto,
+            Long adminId,
+            String encodedName,
+            List<UploadFile> fileList
+    ) {
         log.info("공지사항 생성 - title: {}", requestDto.getTitle());
 
         String name = URLDecoder.decode(encodedName, StandardCharsets.UTF_8);
         Notice notice = requestDto.toEntity(adminId, name);
+        notice.setFiles(fileList);
+
         Notice savedNotice = noticeRepository.save(notice);
 
         log.info("공지사항 생성 완료 - id: {}", savedNotice.getId());
+
         return NoticeDetailResponseDto.from(savedNotice);
     }
     /**
@@ -144,28 +157,6 @@ public class NoticeService {
 
         notice.deactivate();
         log.info("공지사항 삭제 완료 - id: {}", id);
-    }
-
-    public String uploadFile(MultipartFile file) {
-        String uploadPath = System.getProperty("user.dir") + "/uploads/";
-
-        try {
-            // 파일명 중복 방지를 위한 UUID 추가
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get(uploadPath, fileName);
-
-            // 디렉토리 생성
-            Files.createDirectories(filePath.getParent());
-
-            // 파일 저장
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            // 파일 URL 반환 (실제 서비스에서는 CDN URL 등을 반환)
-            return "/files/" + fileName;
-
-        } catch (IOException e) {
-            throw new RuntimeException("파일 업로드 실패", e);
-        }
     }
 
 }

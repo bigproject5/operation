@@ -17,7 +17,6 @@ public class NoticeListResponseDto {
     private String title;
     private Long adminId;
     private String name;
-    private String fileUrl;
     private Integer viewCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -29,7 +28,6 @@ public class NoticeListResponseDto {
                 .title(notice.getTitle())
                 .adminId(notice.getAdminId())
                 .name(notice.getName())
-                .fileUrl(notice.getFileUrl())
                 .viewCount(notice.getViewCount())
                 .createdAt(notice.getCreatedAt())
                 .updatedAt(notice.getUpdatedAt())

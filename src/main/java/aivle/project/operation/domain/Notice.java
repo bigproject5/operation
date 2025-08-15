@@ -1,17 +1,17 @@
 package aivle.project.operation.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "notices")
+@Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,9 +35,6 @@ public class Notice {
     @Column(nullable = false, length = 50)
     private String name;
 
-    @Column(length = 50)
-    private String fileUrl;
-
     @Column(nullable = false)
     @Builder.Default
     private Integer viewCount = 0;
@@ -53,6 +50,9 @@ public class Notice {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UploadFile> files = new ArrayList<>();
 
     // 조회수 증가 메서드
     public void increaseViewCount() {
