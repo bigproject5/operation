@@ -7,9 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -26,6 +28,12 @@ public class NoticeUpdateRequestDto {
     private Boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    private List<Long> removeFileIds; //삭제할 기본 파일 id
+
+    public List<Long> getRemoveFileIds() {
+        return removeFileIds != null ? removeFileIds : new ArrayList<>();
+    }
 
     // Entity to DTO 변환 정적 메서드
     public static NoticeDetailResponseDto from(Notice notice) {

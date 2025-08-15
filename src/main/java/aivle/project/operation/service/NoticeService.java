@@ -9,6 +9,7 @@ import aivle.project.operation.domain.dto.NoticeCreateRequestDto;
 import aivle.project.operation.domain.dto.NoticeUpdateRequestDto;
 import aivle.project.operation.domain.Notice;
 import aivle.project.operation.domain.NoticeRepository;
+import aivle.project.operation.infra.exception.FileUploadException;
 import aivle.project.operation.infra.exception.NoticeNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -39,6 +42,7 @@ public class NoticeService {
 
     private final NoticeRepository noticeRepository;
     private final UploadFileRepository uploadFileRepository;
+    private final FileService fileService;
 
     /**
      * 공지사항 목록 조회 (페이징)
@@ -95,17 +99,79 @@ public class NoticeService {
      * 공지사항 수정
      */
     @Transactional
-    public NoticeDetailResponseDto updateNotice(Long noticeId, NoticeUpdateRequestDto updateDto) {
-        log.info("공지사항 수정 시작 = id: {}", noticeId);
-        Notice notice = noticeRepository.findById(noticeId)
-                .orElseThrow(() -> new NoticeNotFoundException("해당 공지사항을 찾을 수 없습니다. ID: " + noticeId));
-
+    public NoticeDetailResponseDto updateNotice(Long noticeId, List<MultipartFile> files, NoticeUpdateRequestDto updateDto) {
+        log.info("공지사항 수정 시작 - id: {}", noticeId);
+        Notice notice = findNoticeById(noticeId);
         notice.update(updateDto.getTitle(), updateDto.getContent());
-
+        deleteRequestedFiles(notice, updateDto.getRemoveFileIds());
+        uploadNewFiles(notice, files);
         log.info("공지사항 수정 완료 - id: {}", notice.getId());
-
-
         return NoticeDetailResponseDto.from(notice);
+    }
+
+    private Notice findNoticeById(Long noticeId) {
+        return noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new NoticeNotFoundException("해당 공지사항을 찾을 수 없습니다. ID: " + noticeId));
+    }
+
+    private void deleteRequestedFiles(Notice notice, List<Long> removeFileIds) {
+        if (removeFileIds == null || removeFileIds.isEmpty()) {
+            log.debug("삭제할 파일이 없습니다.");
+            return;
+        }
+
+        log.info("삭제할 파일 IDs: {}", removeFileIds);
+
+        for (Long fileId : removeFileIds) {
+            deleteFileById(notice, fileId);
+        }
+    }
+
+    private void deleteFileById(Notice notice, Long fileId) {
+        log.info("파일 삭제 처리 시작 - ID: {}", fileId);
+
+        Optional<UploadFile> uploadFile = uploadFileRepository.findById(fileId);
+        if (uploadFile.isEmpty()) {
+            log.warn("삭제할 파일을 찾을 수 없습니다 - ID: {}", fileId);
+            return;
+        }
+
+        deletePhysicalFile(uploadFile.get());
+        notice.removeFile(fileId);
+        log.info("파일 삭제 완료 - ID: {}", fileId);
+    }
+
+    private void deletePhysicalFile(UploadFile uploadFile) {
+        String fileUrl = uploadFile.getFileUrl();
+        Path filePath = Paths.get(System.getProperty("user.dir"), fileUrl);
+
+        try {
+            if (Files.deleteIfExists(filePath)) {
+                log.info("물리 파일 삭제 성공: {}", filePath);
+            } else {
+                log.warn("물리 파일이 존재하지 않습니다: {}", filePath);
+            }
+        } catch (IOException e) {
+            log.error("물리 파일 삭제 실패: {}", fileUrl, e);
+        }
+    }
+
+    private void uploadNewFiles(Notice notice, List<MultipartFile> files) {
+        if (files == null || files.isEmpty()) {
+            log.debug("업로드할 파일이 없습니다.");
+            return;
+        }
+
+        log.info("새 파일 업로드 시작 - 파일 수: {}", files.size());
+
+        try {
+            List<UploadFile> uploadedFiles = fileService.uploadFile(files);
+            uploadedFiles.forEach(notice::addFile);
+            log.info("새 파일 업로드 완료 - 업로드된 파일 수: {}", uploadedFiles.size());
+        } catch (Exception e) {
+            log.error("파일 업로드 실패", e);
+            throw new FileUploadException("파일 업로드 중 오류가 발생했습니다.", e);
+        }
     }
 
     /**

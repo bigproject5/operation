@@ -59,6 +59,9 @@ public class Notice {
         this.files.add(file);
         file.setNotice(this); // FK 세팅
     }
+    public void removeFile(Long fileId) {
+        files.removeIf(file -> file.getId().equals(fileId));
+    }
 
     // 조회수 증가 메서드
     public void increaseViewCount() {

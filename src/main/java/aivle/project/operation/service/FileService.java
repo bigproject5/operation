@@ -39,6 +39,8 @@ public class FileService {
                 dir.mkdirs();
             }
             List<UploadFile> uploadFiles = new ArrayList<>();
+
+
             for(MultipartFile file : files){
                 if(!file.isEmpty()){
                     String extension = Objects.requireNonNull(file.getOriginalFilename()).substring(file.getOriginalFilename().lastIndexOf("."));

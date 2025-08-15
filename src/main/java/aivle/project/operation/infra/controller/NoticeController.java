@@ -101,9 +101,10 @@ public class NoticeController {
     @PutMapping("/{noticeId}")
     public ResponseEntity<NoticeDetailResponseDto> updateNotice(
             @PathVariable Long noticeId,
-            @RequestBody NoticeUpdateRequestDto updateDto
+            @RequestPart(value = "file", required = false) List<MultipartFile> files,
+            @RequestPart("notice") NoticeUpdateRequestDto updateDto
             ) {
-        NoticeDetailResponseDto responseDto = noticeService.updateNotice(noticeId, updateDto);
+        NoticeDetailResponseDto responseDto = noticeService.updateNotice(noticeId, files, updateDto);
         return ResponseEntity.ok(responseDto);
     }
 
