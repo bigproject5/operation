@@ -52,7 +52,13 @@ public class Notice {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<UploadFile> files = new ArrayList<>();
+
+    public void addFile(UploadFile file) {
+        this.files.add(file);
+        file.setNotice(this); // FK 세팅
+    }
 
     // 조회수 증가 메서드
     public void increaseViewCount() {

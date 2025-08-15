@@ -59,7 +59,7 @@ public class NoticeService {
     public NoticeDetailResponseDto getNoticeDetail(Long id) {
         log.info("공지사항 상세 조회 - id: {}", id);
 
-        Notice notice = noticeRepository.findByIdAndIsActiveTrue(id)
+        Notice notice = noticeRepository.findByIdWithFiles(id)
                 .orElseThrow(() -> new NoticeNotFoundException("공지사항을 찾을 수 없습니다. ID: " + id));
 
         // 조회수 증가
@@ -82,7 +82,8 @@ public class NoticeService {
 
         String name = URLDecoder.decode(encodedName, StandardCharsets.UTF_8);
         Notice notice = requestDto.toEntity(adminId, name);
-        notice.setFiles(fileList);
+
+        fileList.forEach(notice::addFile);
 
         Notice savedNotice = noticeRepository.save(notice);
 

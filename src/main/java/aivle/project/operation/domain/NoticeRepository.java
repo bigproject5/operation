@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -28,4 +29,7 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
     // 조회수 기준 인기 공지사항 조회
     @Query("SELECT n FROM Notice n WHERE n.isActive = true ORDER BY n.viewCount DESC, n.createdAt DESC")
     Page<Notice> findPopularNotices(Pageable pageable);
+
+    @Query("SELECT n FROM Notice n LEFT JOIN FETCH n.files WHERE n.id = :id")
+    Optional<Notice> findByIdWithFiles(@Param("id") Long id);
 }
