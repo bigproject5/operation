@@ -6,6 +6,7 @@ import aivle.project.operation.domain.dto.WorkerEditDto;
 import aivle.project.operation.service.WorkerService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.Fetch;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("api/operation/workers")
 @RequiredArgsConstructor
@@ -56,8 +58,15 @@ public class WorkerController {
         return ResponseEntity.ok(WorkerResponseDto.fromEntity(worker));
     }
 
-    @PatchMapping("/edit")
-    public ResponseEntity<WorkerResponseDto> editWorkerProfile(@RequestBody WorkerEditDto workerEditDto) {
+    @PutMapping("/edit")
+    public ResponseEntity<WorkerResponseDto> editWorkerProfile(
+            @RequestHeader("X-User-Id") String userId,
+            @RequestHeader("X-User-Role") String role,
+            @RequestBody WorkerEditDto workerEditDto
+    ) {
+        log.info("editWorkerProfile" + workerEditDto.toString());
+        if (role.equals("WORKER"))
+            workerEditDto.setWorkerId(Long.parseLong(userId));
         WorkerResponseDto responseDto = workerService.editWorker(workerEditDto);
         return ResponseEntity.ok(responseDto);
     }
