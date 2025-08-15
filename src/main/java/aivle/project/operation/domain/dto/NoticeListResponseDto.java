@@ -20,6 +20,7 @@ public class NoticeListResponseDto {
     private Integer viewCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private boolean hasFiles;
 
     // Entity to DTO 변환 정적 메서드
     public static NoticeListResponseDto from(Notice notice) {
@@ -31,6 +32,7 @@ public class NoticeListResponseDto {
                 .viewCount(notice.getViewCount())
                 .createdAt(notice.getCreatedAt())
                 .updatedAt(notice.getUpdatedAt())
+                .hasFiles(notice.getFiles() != null && !notice.getFiles().isEmpty())
                 .build();
     }
 }
