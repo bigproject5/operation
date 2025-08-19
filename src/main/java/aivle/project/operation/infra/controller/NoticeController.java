@@ -2,6 +2,7 @@ package aivle.project.operation.infra.controller;
 
 import aivle.project.operation.domain.NoticeRepository;
 import aivle.project.operation.domain.UploadFile;
+import aivle.project.operation.domain.UploadFileRepository;
 import aivle.project.operation.domain.dto.NoticeUpdateRequestDto;
 import aivle.project.operation.service.FileService;
 import jakarta.validation.Valid;
@@ -37,6 +38,7 @@ public class NoticeController {
 
     private final NoticeService noticeService; // public → private 수정
     private final FileService fileService;
+    private final UploadFileRepository uploadFileRepository;
     /**
      * 공지사항 목록 조회 API
      * GET /api/notices?page=0&size=10
@@ -174,12 +176,13 @@ public class NoticeController {
             @RequestHeader("X-User-Id") String userId,
             @PathVariable Long fileId
     ) {
+        UploadFile uploadFile = uploadFileRepository.findById(fileId).orElseThrow(() -> new RuntimeException("파일이 존재하지 않습니다."));
         Resource resource = fileService.downloadFile(fileId);
-        String contentType = fileService.getFileContentType(resource);
+        String contentType = uploadFile.getContentType();
 
         log.info("파일 다운로드 요청 사용자: {}, 파일: {}", userId, fileId);
 
-        String fileName = resource.getFilename();
+        String fileName = uploadFile.getFileName();
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
                 .contentType(MediaType.parseMediaType(contentType))

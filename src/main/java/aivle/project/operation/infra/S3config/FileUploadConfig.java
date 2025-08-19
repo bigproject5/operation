@@ -1,6 +1,5 @@
-package aivle.project.operation.infra;
+package aivle.project.operation.infra.S3config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -31,11 +30,4 @@ public class FileUploadConfig {
 
     // 파일 크기 제한 (10MB)
     public static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
-
-    @Value("${file.upload.path:/var/uploads/}")
-    private String uploadPath;
-
-    public String getUploadPath() {
-        return uploadPath;
-    }
 }

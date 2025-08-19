@@ -2,6 +2,8 @@ package aivle.project.operation.service;
 
 import aivle.project.operation.domain.UploadFile;
 import aivle.project.operation.domain.UploadFileRepository;
+import aivle.project.operation.infra.S3config.FileUploadConfig;
+import aivle.project.operation.infra.exception.FileUploadException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -14,11 +16,11 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -28,7 +30,7 @@ import java.util.UUID;
 public class FileService {
 
     private final UploadFileRepository uploadFileRepository;
-
+    private final FileUploadConfig fileUploadConfig;
     private final AmazonS3 amazonS3;
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -36,11 +38,12 @@ public class FileService {
     public List<UploadFile> uploadFile(List<MultipartFile> files) {
         List<UploadFile> uploadFiles = new ArrayList<>();
 
-        for(MultipartFile file : files){
-            if(!file.isEmpty()){
+        for (MultipartFile file : files) {
+            if (!file.isEmpty()) {
+                validateFile(file); // 파일 유효성 검사
                 try {
-                    String extension = Objects.requireNonNull(file.getOriginalFilename()).substring(file.getOriginalFilename().lastIndexOf("."));
-                    String savedName = UUID.randomUUID() + extension;
+                    String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
+                    String savedName = UUID.randomUUID() + "." + extension;
                     String keyName = "uploads/" + savedName; // S3 키
 
                     // S3 업로드
@@ -59,16 +62,36 @@ public class FileService {
                     uploadFile.setSavedName(savedName);
                     uploadFile.setFileUrl(s3Url); // S3 URL
                     uploadFile.setFileSize(file.getSize());
+                    uploadFile.setContentType(file.getContentType());
                     uploadFiles.add(uploadFile);
 
                     log.info("S3 파일 업로드 완료: {}", s3Url);
                 } catch (Exception e) {
                     log.error("S3 파일 업로드 실패: {}", file.getOriginalFilename(), e);
-                    throw new RuntimeException("S3 파일 업로드 실패", e);
+                    throw new FileUploadException("S3 파일 업로드 실패", e);
                 }
             }
         }
         return uploadFiles;
+    }
+
+    private void validateFile(MultipartFile file) {
+        // 파일 크기 검사
+        if (file.getSize() > FileUploadConfig.MAX_FILE_SIZE) {
+            throw new FileUploadException("파일 크기가 너무 큽니다. 최대 " + FileUploadConfig.MAX_FILE_SIZE / (1024 * 1024) + "MB까지 허용됩니다.");
+        }
+
+        // 파일 확장자 검사
+        String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
+        if (extension == null || !FileUploadConfig.ALLOWED_EXTENSIONS.contains(extension.toLowerCase())) {
+            throw new FileUploadException("허용되지 않는 파일 확장자입니다. (허용: " + FileUploadConfig.ALLOWED_EXTENSIONS + ")");
+        }
+
+        // MIME 타입 검사
+        String mimeType = file.getContentType();
+        if (mimeType == null || !FileUploadConfig.ALLOWED_MIME_TYPES.contains(mimeType)) {
+            throw new FileUploadException("허용되지 않는 파일 형식입니다. (허용: " + FileUploadConfig.ALLOWED_MIME_TYPES + ")");
+        }
     }
 
     public Resource downloadFile(Long fileId) {
@@ -93,33 +116,6 @@ public class FileService {
         } catch (Exception e) {
             log.error("S3 파일 다운로드 실패: fileId={}", fileId, e);
             throw new RuntimeException("S3 파일 다운로드 실패", e);
-        }
-    }
-
-    public String getFileContentType(Resource resource) {
-        // S3에서는 업로드 시 저장된 메타데이터를 사용하거나
-        // 파일 확장자로 추론
-        try {
-            if (resource instanceof InputStreamResource) {
-                // 파일 확장자로 Content-Type 추론
-                String filename = resource.getFilename();
-                if (filename != null && filename.contains(".")) {
-                    String extension = filename.substring(filename.lastIndexOf(".")).toLowerCase();
-                    switch (extension) {
-                        case ".pdf": return "application/pdf";
-                        case ".jpg":
-                        case ".jpeg": return "image/jpeg";
-                        case ".png": return "image/png";
-                        case ".txt": return "text/plain";
-                        case ".doc": return "application/msword";
-                        case ".docx": return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-                        default: return "application/octet-stream";
-                    }
-                }
-            }
-            return "application/octet-stream";
-        } catch (Exception e) {
-            return "application/octet-stream";
         }
     }
 

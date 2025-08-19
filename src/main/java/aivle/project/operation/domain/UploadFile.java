@@ -23,7 +23,9 @@ public class UploadFile {
     private String savedName;
     private String fileUrl;
     private Long fileSize;
+    private String contentType;
 
     @Column(updatable = false)
     private LocalDateTime uploadTime = LocalDateTime.now();
 }
+
