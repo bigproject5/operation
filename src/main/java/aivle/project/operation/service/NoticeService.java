@@ -21,18 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -79,12 +69,11 @@ public class NoticeService {
     public NoticeDetailResponseDto createNotice(
             NoticeCreateRequestDto requestDto,
             Long adminId,
-            String encodedName,
+            String name,
             List<UploadFile> fileList
     ) {
         log.info("공지사항 생성 - title: {}", requestDto.getTitle());
 
-        String name = URLDecoder.decode(encodedName, StandardCharsets.UTF_8);
         Notice notice = requestDto.toEntity(adminId, name);
 
         fileList.forEach(notice::addFile);
@@ -142,29 +131,12 @@ public class NoticeService {
     }
 
     private void deletePhysicalFile(UploadFile uploadFile) {
-        // ============ 로컬 파일 삭제 방식 ============
-        String fileUrl = uploadFile.getFileUrl();
-        Path filePath = Paths.get(System.getProperty("user.dir"), fileUrl);
-
         try {
-            if (Files.deleteIfExists(filePath)) {
-                log.info("물리 파일 삭제 성공: {}", filePath);
-            } else {
-                log.warn("물리 파일이 존재하지 않습니다: {}", filePath);
-            }
-        } catch (IOException e) {
-            log.error("물리 파일 삭제 실패: {}", fileUrl, e);
+            fileService.deleteS3File(uploadFile.getSavedName());
+            log.info("S3 파일 삭제 성공: {}", uploadFile.getSavedName());
+        } catch (Exception e) {
+            log.error("S3 파일 삭제 실패: {}", uploadFile.getSavedName(), e);
         }
-
-        // ============ S3 파일 삭제 방식 (주석 해제 시 사용) ============
-    /*
-    try {
-        fileService.deleteS3File(uploadFile.getSavedName());
-        log.info("S3 파일 삭제 성공: {}", uploadFile.getSavedName());
-    } catch (Exception e) {
-        log.error("S3 파일 삭제 실패: {}", uploadFile.getSavedName(), e);
-    }
-    */
     }
 
     private void uploadNewFiles(Notice notice, List<MultipartFile> files) {

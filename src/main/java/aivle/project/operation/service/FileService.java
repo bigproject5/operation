@@ -2,25 +2,25 @@ package aivle.project.operation.service;
 
 import aivle.project.operation.domain.UploadFile;
 import aivle.project.operation.domain.UploadFileRepository;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -29,48 +29,11 @@ public class FileService {
 
     private final UploadFileRepository uploadFileRepository;
 
-    // S3 사용 시 주석 해제
-    // private final AmazonS3 amazonS3;
-    // @Value("${cloud.aws.s3.bucket}")
-    // private String bucketName;
+    private final AmazonS3 amazonS3;
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
 
     public List<UploadFile> uploadFile(List<MultipartFile> files) {
-        // ============ 로컬 저장 방식 ============
-        Path uploadDir = Paths.get(System.getProperty("user.dir"), "uploads");
-
-        try {
-            File dir = uploadDir.toFile();
-            if(!dir.exists()){
-                dir.mkdirs();
-            }
-            List<UploadFile> uploadFiles = new ArrayList<>();
-
-            for(MultipartFile file : files){
-                if(!file.isEmpty()){
-                    String extension = Objects.requireNonNull(file.getOriginalFilename()).substring(file.getOriginalFilename().lastIndexOf("."));
-                    String savedName = UUID.randomUUID() + extension;
-
-                    // 로컬 저장
-                    Path filePath = uploadDir.resolve(savedName);
-                    file.transferTo(filePath.toFile());
-
-                    UploadFile uploadFile = new UploadFile();
-                    uploadFile.setFileName(file.getOriginalFilename());
-                    uploadFile.setSavedName(savedName);
-                    uploadFile.setFileUrl("/uploads/" + savedName); // 로컬 경로
-                    uploadFile.setFileSize(file.getSize());
-                    uploadFiles.add(uploadFile);
-
-                    log.info("파일 저장 완료: {}/{}", filePath, file.getOriginalFilename());
-                }
-            }
-            return uploadFiles;
-        } catch (IOException e) {
-            throw new RuntimeException("파일 업로드 실패", e);
-        }
-
-        // ============ S3 저장 방식 (주석 해제 시 사용) ============
-        /*
         List<UploadFile> uploadFiles = new ArrayList<>();
 
         for(MultipartFile file : files){
@@ -106,33 +69,12 @@ public class FileService {
             }
         }
         return uploadFiles;
-        */
     }
 
     public Resource downloadFile(Long fileId) {
-        // ============ 로컬 다운로드 방식 ============
         try {
             UploadFile uploadFile = uploadFileRepository.findById(fileId)
                     .orElseThrow(() -> new RuntimeException("파일을 존재하지 않습니다."));
-
-            Path uploadDir = Paths.get(System.getProperty("user.dir"), "uploads").resolve(uploadFile.getSavedName());
-            Resource resource = new UrlResource(uploadDir.toUri());
-
-            if(!resource.exists()){
-                throw new RuntimeException("파일이 존재하지 않습니다.");
-            }
-
-            return resource;
-        }
-        catch (Exception e){
-            throw new RuntimeException("파일 로드 실패", e);
-        }
-
-        // ============ S3 다운로드 방식 (주석 해제 시 사용) ============
-        /*
-        try {
-            UploadFile uploadFile = uploadFileRepository.findById(fileId)
-                    .orElseThrow(() -> new RuntimeException("파일이 존재하지 않습니다."));
 
             String keyName = "uploads/" + uploadFile.getSavedName();
 
@@ -152,19 +94,9 @@ public class FileService {
             log.error("S3 파일 다운로드 실패: fileId={}", fileId, e);
             throw new RuntimeException("S3 파일 다운로드 실패", e);
         }
-        */
     }
 
     public String getFileContentType(Resource resource) {
-        try {
-            String contentType = Files.probeContentType(Paths.get(resource.getURI()));
-            return contentType != null ? contentType : "application/octet-stream";
-        } catch (IOException e) {
-            return "application/octet-stream";
-        }
-
-        // ============ S3용 Content-Type (주석 해제 시 사용) ============
-        /*
         // S3에서는 업로드 시 저장된 메타데이터를 사용하거나
         // 파일 확장자로 추론
         try {
@@ -189,11 +121,8 @@ public class FileService {
         } catch (Exception e) {
             return "application/octet-stream";
         }
-        */
     }
 
-    // ============ S3 파일 삭제 메서드 (주석 해제 시 사용) ============
-    /*
     public void deleteS3File(String savedName) {
         try {
             String keyName = "uploads/" + savedName;
@@ -204,5 +133,4 @@ public class FileService {
             throw new RuntimeException("S3 파일 삭제 실패", e);
         }
     }
-    */
 }

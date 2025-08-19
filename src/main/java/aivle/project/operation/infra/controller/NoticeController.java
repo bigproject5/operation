@@ -22,6 +22,8 @@ import aivle.project.operation.domain.dto.NoticeDetailResponseDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,11 +71,11 @@ public class NoticeController {
     @PostMapping
     public ResponseEntity<NoticeDetailResponseDto> createNotice(
             @RequestHeader("X-User-Id") String adminId,
-            @RequestHeader("X-User-Name") String name,
+            @RequestHeader("X-User-Name") String encodedName,
             @RequestPart(value = "file", required = false) List<MultipartFile> files,
             @RequestPart("notice") @Valid NoticeCreateRequestDto requestDto
     ) {
-
+        String name = URLDecoder.decode(encodedName, StandardCharsets.UTF_8);
         log.info("POST /api/operation/notices - title: {}, adminId: {}, name: {}",
                 requestDto.getTitle(), adminId, name);
 
