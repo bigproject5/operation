@@ -10,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 @RequestMapping(value = "/api/operation")
 @RestController
 public class LoginController {
@@ -75,9 +78,10 @@ public class LoginController {
     public ResponseEntity<UserDto> me(
             @RequestHeader("X-User-Id") String userId,
             @RequestHeader("X-User-Role") String role,
-            @RequestHeader("X-User-Name") String name,
+            @RequestHeader("X-User-Name") String encodedName,
             @RequestHeader(value = "X-User-Task-Type", required = false) String taskType
     ){
+        String name = URLDecoder.decode(encodedName, StandardCharsets.UTF_8);
         UserDto user = new UserDto();
         user.setId(Long.parseLong(userId));
         user.setRole(role);
