@@ -91,11 +91,12 @@ public class LoginService {
         }
         String token = jwtUtil.createToken("ADMIN", admin.getAdminId(), admin.getName(), "ADMIN");
         LoginResponseDto response = new LoginResponseDto();
+        String maskedName = maskName(admin.getName());
         response.setToken(token);
         response.setExpiresIn(expirationTime / 1000); // 초단위
         UserDto user = new UserDto();
         user.setId(admin.getAdminId());
-        user.setName(admin.getName());
+        user.setName(maskedName);
         user.setRole("ADMIN");
         user.setTaskType("ADMIN");
         response.setUser(user);
@@ -115,12 +116,13 @@ public class LoginService {
         }
 
         String token = jwtUtil.createToken("WORKER", worker.getWorkerId(), worker.getName(), worker.getTaskType());
+        String maskedName = maskName(worker.getName());
         LoginResponseDto response = new LoginResponseDto();
         response.setToken(token);
         response.setExpiresIn(expirationTime / 1000); // 초
         UserDto user = new UserDto();
         user.setId(worker.getWorkerId());
-        user.setName(worker.getName());
+        user.setName(maskedName);
         user.setRole("WORKER");
         user.setTaskType(worker.getTaskType());
         response.setUser(user);
@@ -153,6 +155,7 @@ public class LoginService {
         user.setId(1L);
         user.setName("develop");
         user.setRole("DEV");
+        user.setTaskType("dev");
         response.setUser(user);
 
         return response;
@@ -180,7 +183,24 @@ public class LoginService {
                 .authorities("ROLE_WORKER")
                 .build();
     }
+    public String maskName(String name) {
+        if (name == null || name.isEmpty()) {
+            return "";
+        }
+        int length = name.length();
 
+        if (length == 1) {
+            return name;
+        } else if (length == 2) {
+            return name.charAt(0) + "*";
+        } else {
+            String firstName = name.substring(0, 1);
+            String lastName = name.substring(length - 1);
+            String middleMask = "*".repeat(length - 2); // Java 11+
+
+            return firstName + middleMask + lastName;
+        }
+    }
 
 
 }

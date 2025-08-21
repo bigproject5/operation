@@ -82,10 +82,11 @@ public class LoginController {
             @RequestHeader(value = "X-User-Task-Type", required = false) String taskType
     ){
         String name = URLDecoder.decode(encodedName, StandardCharsets.UTF_8);
+        String maskedName = loginService.maskName(name);
         UserDto user = new UserDto();
         user.setId(Long.parseLong(userId));
         user.setRole(role);
-        user.setName(name);
+        user.setName(maskedName);
         user.setTaskType(taskType);
         return ResponseEntity.ok(user);
     }
