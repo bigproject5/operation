@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: operation
-        image: hyeongmin90/operation_app:v3
+        image: #도커 이미지
         ports:
         - containerPort: 8080
         env:
