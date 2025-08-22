@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: operation-deployment
+  labels:
+    app: operation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: operation
+  template:
+    metadata:
+      labels:
+        app: operation
+    spec:
+      containers:
+      - name: operation
+        image: hyeongmin90/operation_app:v3
+        ports:
+        - containerPort: 8080
+        env:
+        - name: CAPTCHA_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: operation-secrets # Name of the Kubernetes Secret for operation service
+              key: captcha.secretKey
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: operation-secrets # Or a shared JWT secret if applicable
+              key: jwt.secretKey
+        - name: S3_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: operation-secrets
+              key: s3.accessKey
+        - name: S3_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: operation-secrets
+              key: s3.secretKey
+        - name: S3_BUCKET
+          valueFrom:
+            secretKeyRef:
+              name: operation-secrets
+              key: s3.bucket
+        - name: DB_URL
+          valueFrom:
+            secretKeyRef:
+              name: operation-secrets
+              key: db.url
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: operation-secrets
+              key: db.username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: operation-secrets
+              key: db.password

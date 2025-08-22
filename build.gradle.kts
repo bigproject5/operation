@@ -40,6 +40,8 @@ dependencies {
 	implementation ("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
 	implementation("software.amazon.awssdk:s3:2.20.26")
+	implementation ("io.github.cdimascio:dotenv-java:3.0.0")
+	runtimeOnly("com.mysql:mysql-connector-j")
 }
 
 tasks.withType<Test> {
