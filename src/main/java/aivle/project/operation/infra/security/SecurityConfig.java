@@ -31,10 +31,8 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/operation/admin/test").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/operation/notices").permitAll()
                         .requestMatchers("/api/operation/notices").hasAnyRole("ADMIN", "DEV")
-                        .requestMatchers("/api/operation/worker/test").hasRole("WORKER")
                         .anyRequest().permitAll()
                 )
                 .headers(headers -> headers

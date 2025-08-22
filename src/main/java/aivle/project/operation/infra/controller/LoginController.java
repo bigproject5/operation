@@ -18,15 +18,13 @@ import java.nio.charset.StandardCharsets;
 public class LoginController {
 
     private final LoginService loginService;
-    private final JwtUtil jwtUtil;
 
     @Autowired
-    public LoginController(LoginService loginService, JwtUtil jwtUtil) {
+    public LoginController(LoginService loginService) {
         this.loginService = loginService;
-        this.jwtUtil = jwtUtil;
     }
 
-    @PostMapping(value = "/admin/signup")
+    @PostMapping(value = "/signup/admin")
     public ResponseEntity<?> adminRegister(@RequestBody @Valid AdminSignupRequestDto adminSignupRequestDto){
         try{
             SignupResponseDto responseDto =  loginService.adminSignup(adminSignupRequestDto);
@@ -41,19 +39,19 @@ public class LoginController {
         }
     }
 
-    @PostMapping(value = "/workers/signup")
+    @PostMapping(value = "/signup/workers")
     public ResponseEntity<SignupResponseDto> workerRegister(@RequestBody @Valid WorkerSignupRequestDto workerSignupRequestDto){
         loginService.workerSignup(workerSignupRequestDto);
         return ResponseEntity.ok(new SignupResponseDto(workerSignupRequestDto));
     }
 
-    @PostMapping(value = "/admin/login")
+    @PostMapping(value = "/login/admin")
     public ResponseEntity<LoginResponseDto> adminLogin(@RequestBody LoginRequestDto loginRequestDto){
         LoginResponseDto response = loginService.adminLogin(loginRequestDto);
         return ResponseEntity.ok(response);
     }
     
-    @PostMapping(value = "/workers/login")
+    @PostMapping(value = "/login/workers")
     public ResponseEntity<LoginResponseDto> workerLogin(@RequestBody LoginRequestDto loginRequestDto){
         LoginResponseDto response = loginService.workerLogin(loginRequestDto);
         return ResponseEntity.ok(response);
@@ -68,7 +66,7 @@ public class LoginController {
     /**
      * TODO: 개발용 함수, 추후 제거 필요
      */
-    @PostMapping(value = "/dev/login")
+    @PostMapping("/login/dev")
     public ResponseEntity<LoginResponseDto> DevLogin(){
         LoginResponseDto response = loginService.devLogin();
         return ResponseEntity.ok(response);
@@ -89,5 +87,11 @@ public class LoginController {
         user.setName(maskedName);
         user.setTaskType(taskType);
         return ResponseEntity.ok(user);
+    }
+
+
+    @GetMapping("/health")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("Notice Service is running!");
     }
 }

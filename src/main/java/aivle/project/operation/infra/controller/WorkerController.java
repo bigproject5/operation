@@ -25,23 +25,6 @@ import java.util.stream.Collectors;
 public class WorkerController {
     private final WorkerService workerService;
 
-    //작업자 등록
-//    @PostMapping
-//    public ResponseEntity<WorkerResponseDto> register(@RequestBody WorkerRequestDto requestDto) {
-//        Worker worker = Worker.builder()
-//                .loginId(requestDto.getLoginId())
-//                .password(requestDto.getPassword())
-//                .employeeNumber(requestDto.getEmployeeNumber())
-//                .name(requestDto.getName())
-//                .email(requestDto.getEmail())
-//                .phoneNumber(requestDto.getPhoneNumber())
-//                .address(requestDto.getAddress())
-//                .createdAt(LocalDate.now())
-//                .build();
-//
-//        Worker savedWorker = workerService.registerWorker(worker);
-//        return ResponseEntity.ok(WorkerResponseDto.fromEntity(savedWorker));
-//    }
     //전체 작업자 조회
     @GetMapping
     public ResponseEntity<List<WorkerResponseDto>> getAllWorkers() {

@@ -190,12 +190,5 @@ public class NoticeController {
     }
 
 
-    /**
-     * Health Check API
-     * GET /api/notices/health
-     */
-    @GetMapping("/health")
-    public ResponseEntity<String> healthCheck() {
-        return ResponseEntity.ok("Notice Service is running!");
-    }
+
 }
