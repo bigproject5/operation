@@ -44,20 +44,20 @@ public class LoginService {
             throw new IllegalArgumentException("This ID already exists.");
         }
 
-//        String verifyUrl = "https://www.google.com/recaptcha/api/siteverify";
-//
-//        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-//        params.add("secret", reCaptchaSecret); // 서버 전용
-//        params.add("response", requestDto.getReCaptchaToken());
-//
-//        RestTemplate restTemplate = new RestTemplate();
-//        RecaptchaResponse recaptchaResponse =
-//                restTemplate.postForObject(verifyUrl, params, RecaptchaResponse.class);
-//
-//        assert recaptchaResponse != null;
-//        if (!recaptchaResponse.isSuccess() || recaptchaResponse.getScore() < 0.5) {
-//            throw new CaptchaFailedException("Captcha failed");
-//        }
+        String verifyUrl = "https://www.google.com/recaptcha/api/siteverify";
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("secret", reCaptchaSecret); // 서버 전용
+        params.add("response", requestDto.getReCaptchaToken());
+
+        RestTemplate restTemplate = new RestTemplate();
+        RecaptchaResponse recaptchaResponse =
+                restTemplate.postForObject(verifyUrl, params, RecaptchaResponse.class);
+
+        assert recaptchaResponse != null;
+        if (!recaptchaResponse.isSuccess() || recaptchaResponse.getScore() < 0.5) {
+            throw new CaptchaFailedException("Captcha failed");
+        }
 
         String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
 
@@ -183,7 +183,7 @@ public class LoginService {
                 .authorities("ROLE_WORKER")
                 .build();
     }
-    public String maskName(String name) {
+    public static String maskName(String name) {
         if (name == null || name.isEmpty()) {
             return "";
         }
