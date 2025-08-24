@@ -22,16 +22,16 @@ import java.util.stream.Collectors;
 public class WorkerService {
     private final WorkerRepository workerRepository;
 
-//    public Worker registerWorker(Worker worker) {
-//        return workerRepository.save(worker);
-//    }
     public List<Worker> getAllWorks() {
         return workerRepository.findAll();
     }
 
     public Worker getWorkerById(Long id) {
-        return workerRepository.findById(id)
+        Worker worker = workerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("해당 ID의 작업자를 찾을 수 없습니다: "+id));
+        String maskedName = LoginService.maskName(worker.getName());
+        worker.setName(maskedName);
+        return worker;
     }
 
     public void deleteWorker(Long id) {
