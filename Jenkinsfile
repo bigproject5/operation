@@ -1,7 +1,28 @@
 pipeline {
-    agent any
-    tools {
-        dockerTool 'docker'
+    agent {
+        kubernetes {
+            yaml """
+              apiVersion: v1
+              kind: Pod
+              spec:
+                containers:
+                - name: docker
+                  image: docker:20.10.12-dind
+                  securityContext:
+                    privileged: true
+                  command:
+                  - cat
+                  tty: true
+                  env:
+                  - name: DOCKER_TLS_CERTDIR
+                    value: ""
+                - name: aws-kubectl
+                  image: amazon/aws-cli:latest
+                  command:
+                  - cat
+                  tty: true
+            """
+        }
     }
 
     environment {
