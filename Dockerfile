@@ -10,7 +10,7 @@ FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
 # Copy the JAR file from the build stage
-COPY --from=build /home/gradle/src/build/libs/*.jar app.jar
+COPY --from=build /home/gradle/src/build/libs/*-SNAPSHOT.jar app.jar
 
 # Expose the port the app runs on
 EXPOSE 8080
