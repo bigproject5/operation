@@ -1,10 +1,8 @@
 pipeline {
-    agent {
-            kubernetes {
-                label 'dind-agent'
-                defaultContainer 'jnlp'
-            }
-        }
+    agent any
+    tools {
+        dockerTool 'docker'
+    }
 
     environment {
         AWS_ACCOUNT_ID      = "956463122808"
@@ -26,6 +24,7 @@ pipeline {
             steps {
                 script {
                     def imageTag = "build-${env.BUILD_NUMBER}"
+                    sh 'docker --version'
 
                     withAWS(credentials: 'aws-credentials', region: "${AWS_DEFAULT_REGION}") {
                         sh "docker build -t ${ECR_IMAGE_URI}:${imageTag} ."
