@@ -16,19 +16,19 @@ spec:
     spec:
       containers:
       - name: operation
-        image: #도커 이미지
+        image: 956463122808.dkr.ecr.ap-northeast-2.amazonaws.com/operation:v2
         ports:
         - containerPort: 8080
         env:
         - name: CAPTCHA_SECRET
           valueFrom:
             secretKeyRef:
-              name: operation-secrets # Name of the Kubernetes Secret for operation service
+              name: operation-secrets
               key: captcha.secretKey
         - name: JWT_SECRET
           valueFrom:
             secretKeyRef:
-              name: operation-secrets # Or a shared JWT secret if applicable
+              name: operation-secrets
               key: jwt.secretKey
         - name: S3_ACCESS_KEY
           valueFrom:

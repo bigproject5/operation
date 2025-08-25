@@ -201,6 +201,4 @@ public class LoginService {
             return firstName + middleMask + lastName;
         }
     }
-
-
 }
