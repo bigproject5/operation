@@ -16,11 +16,20 @@ pipeline {
                   env:
                   - name: DOCKER_TLS_CERTDIR
                     value: ""
+                  volumeMounts:
+                  - name: shared-volume
+                    mountPath: /shared
                 - name: aws-kubectl
                   image: amazon/aws-cli:latest
                   command:
                   - cat
                   tty: true
+                  volumeMounts:
+                  - name: shared-volume
+                    mountPath: /shared
+                volumes:
+                - name: shared-volume
+                  emptyDir: {}
             """
         }
     }
@@ -56,48 +65,41 @@ pipeline {
 
         stage('Build & Push Docker Image') {
             steps {
-                container('docker') {  // 이 부분이 중요!
+                container('docker') {
                     script {
                         def imageTag = "build-${env.BUILD_NUMBER}"
 
-                        // Docker daemon이 시작될 때까지 대기
                         sh 'dockerd-entrypoint.sh &'
                         sh 'sleep 10'
                         sh 'docker --version'
-
-                        withAWS(credentials: 'aws-credentials', region: "${AWS_DEFAULT_REGION}") {
-                            // AWS CLI가 docker 컨테이너에 없으므로 다른 방법 사용
-                            sh "docker build -t ${ECR_IMAGE_URI}:${imageTag} ."
-
-                            // ECR 로그인을 aws-kubectl 컨테이너에서 수행
-                        }
+                        sh "docker build -t ${ECR_IMAGE_URI}:${imageTag} ."
+                        sh "docker tag ${ECR_IMAGE_URI}:${imageTag} ${ECR_IMAGE_URI}:latest"
                     }
                 }
 
-                // ECR 로그인과 푸시를 분리
+                // ECR 로그인 토큰을 공유 볼륨에 저장
                 container('aws-kubectl') {
                     withAWS(credentials: 'aws-credentials', region: "${AWS_DEFAULT_REGION}") {
-                        script {
-                            def imageTag = "build-${env.BUILD_NUMBER}"
-                            sh """
-                                # ECR 로그인 토큰 가져오기
-                                aws ecr get-login-password --region ${AWS_DEFAULT_REGION} > /tmp/ecr-password
-                            """
-                        }
+                        sh """
+                            aws ecr get-login-password --region ${AWS_DEFAULT_REGION} > /shared/ecr-password
+                        """
                     }
                 }
 
+                // Docker push
                 container('docker') {
                     script {
                         def imageTag = "build-${env.BUILD_NUMBER}"
                         sh """
-                            # ECR 로그인
-                            cat /tmp/ecr-password | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+                            # ECR 로그인 (공유 볼륨에서 패스워드 읽기)
+                            cat /shared/ecr-password | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
 
                             # 이미지 푸시
                             docker push ${ECR_IMAGE_URI}:${imageTag}
-                            docker tag ${ECR_IMAGE_URI}:${imageTag} ${ECR_IMAGE_URI}:latest
                             docker push ${ECR_IMAGE_URI}:latest
+
+                            # 정리
+                            rm -f /shared/ecr-password
                         """
                     }
                 }
