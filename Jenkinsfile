@@ -40,7 +40,8 @@ pipeline {
         ECR_REPOSITORY_NAME = "operation"
         K8S_DEPLOYMENT_NAME = "operation-deployment"
         K8S_NAMESPACE       = "default"
-        ECR_IMAGE_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPOSITORY_NAME}"
+        ECR_IMAGE_URI       = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPOSITORY_NAME}"
+        EKS_CLUSTER_NAME    = "aivle-5-eks"
     }
 
     stages {
@@ -112,7 +113,7 @@ pipeline {
                     script {
                         withAWS(credentials: 'aws-credentials', region: "${AWS_DEFAULT_REGION}") {
                             sh """
-                                aws eks update-kubeconfig --region ${AWS_DEFAULT_REGION} --name your-cluster-name
+                                aws eks update-kubeconfig --region ${AWS_DEFAULT_REGION} --name ${EKS_CLUSTER_NAME}
                                 kubectl set image deployment/${K8S_DEPLOYMENT_NAME} \
                                         ${ECR_REPOSITORY_NAME}=${ECR_IMAGE_URI}:latest \
                                         -n ${K8S_NAMESPACE}
