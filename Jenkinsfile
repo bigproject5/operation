@@ -37,8 +37,8 @@ pipeline {
     environment {
         AWS_ACCOUNT_ID      = "956463122808"
         AWS_DEFAULT_REGION  = "ap-northeast-2"
-        ECR_REPOSITORY_NAME = "operation"
-        K8S_DEPLOYMENT_NAME = "operation-deployment"
+        ECR_REPOSITORY_NAME = "frontend"
+        K8S_DEPLOYMENT_NAME = "frontend-deployment"
         K8S_NAMESPACE       = "default"
         ECR_IMAGE_URI       = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPOSITORY_NAME}"
         EKS_CLUSTER_NAME    = "aivle-5-eks"
@@ -97,7 +97,6 @@ pipeline {
 
                             # 이미지 푸시
                             docker push ${ECR_IMAGE_URI}:${imageTag}
-                            docker push ${ECR_IMAGE_URI}:latest
 
                             # 정리
                             rm -f /shared/ecr-password
@@ -114,9 +113,11 @@ pipeline {
                         withAWS(credentials: 'aws-credentials', region: "${AWS_DEFAULT_REGION}") {
                             sh """
                                 aws eks update-kubeconfig --region ${AWS_DEFAULT_REGION} --name ${EKS_CLUSTER_NAME}
+
                                 kubectl set image deployment/${K8S_DEPLOYMENT_NAME} \
-                                        ${ECR_REPOSITORY_NAME}=${ECR_IMAGE_URI}:latest \
+                                        ${ECR_REPOSITORY_NAME}=${ECR_IMAGE_URI}:${imageTag} \
                                         -n ${K8S_NAMESPACE}
+
                                 kubectl rollout status deployment/${K8S_DEPLOYMENT_NAME} -n ${K8S_NAMESPACE}
                             """
                         }
