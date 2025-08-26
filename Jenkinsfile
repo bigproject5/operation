@@ -42,6 +42,8 @@ pipeline {
         K8S_NAMESPACE       = "default"
         ECR_IMAGE_URI       = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPOSITORY_NAME}"
         EKS_CLUSTER_NAME    = "aivle-5-eks"
+        // 파이프라인 레벨에서 이미지 태그 정의
+        IMAGE_TAG           = "build-${BUILD_NUMBER}"
     }
 
     stages {
@@ -67,15 +69,11 @@ pipeline {
         stage('Build & Push Docker Image') {
             steps {
                 container('docker') {
-                    script {
-                        def imageTag = "build-${env.BUILD_NUMBER}"
-
-                        sh 'dockerd-entrypoint.sh &'
-                        sh 'sleep 10'
-                        sh 'docker --version'
-                        sh "docker build -t ${ECR_IMAGE_URI}:${imageTag} ."
-                        sh "docker tag ${ECR_IMAGE_URI}:${imageTag} ${ECR_IMAGE_URI}:latest"
-                    }
+                    sh 'dockerd-entrypoint.sh &'
+                    sh 'sleep 10'
+                    sh 'docker --version'
+                    sh "docker build -t ${ECR_IMAGE_URI}:${IMAGE_TAG} ."
+                    sh "docker tag ${ECR_IMAGE_URI}:${IMAGE_TAG} ${ECR_IMAGE_URI}:latest"
                 }
 
                 // ECR 로그인 토큰을 공유 볼륨에 저장
@@ -89,19 +87,17 @@ pipeline {
 
                 // Docker push
                 container('docker') {
-                    script {
-                        def imageTag = "build-${env.BUILD_NUMBER}"
-                        sh """
-                            # ECR 로그인 (공유 볼륨에서 패스워드 읽기)
-                            cat /shared/ecr-password | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+                    sh """
+                        # ECR 로그인 (공유 볼륨에서 패스워드 읽기)
+                        cat /shared/ecr-password | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
 
-                            # 이미지 푸시
-                            docker push ${ECR_IMAGE_URI}:${imageTag}
+                        # 이미지 푸시
+                        docker push ${ECR_IMAGE_URI}:${IMAGE_TAG}
+                        docker push ${ECR_IMAGE_URI}:latest
 
-                            # 정리
-                            rm -f /shared/ecr-password
-                        """
-                    }
+                        # 정리
+                        rm -f /shared/ecr-password
+                    """
                 }
             }
         }
@@ -109,18 +105,17 @@ pipeline {
         stage('Deploy to EKS') {
             steps {
                 container('aws-kubectl') {
-                    script {
-                        withAWS(credentials: 'aws-credentials', region: "${AWS_DEFAULT_REGION}") {
-                            sh """
-                                aws eks update-kubeconfig --region ${AWS_DEFAULT_REGION} --name ${EKS_CLUSTER_NAME}
+                    withAWS(credentials: 'aws-credentials', region: "${AWS_DEFAULT_REGION}") {
+                        sh """
+                            aws eks update-kubeconfig --region ${AWS_DEFAULT_REGION} --name ${EKS_CLUSTER_NAME}
 
-                                kubectl set image deployment/${K8S_DEPLOYMENT_NAME} \
-                                        ${ECR_REPOSITORY_NAME}=${ECR_IMAGE_URI}:${imageTag} \
-                                        -n ${K8S_NAMESPACE}
+                            # 유니크한 태그로 배포
+                            kubectl set image deployment/${K8S_DEPLOYMENT_NAME} \
+                                    ${ECR_REPOSITORY_NAME}=${ECR_IMAGE_URI}:${IMAGE_TAG} \
+                                    -n ${K8S_NAMESPACE}
 
-                                kubectl rollout status deployment/${K8S_DEPLOYMENT_NAME} -n ${K8S_NAMESPACE}
-                            """
-                        }
+                            kubectl rollout status deployment/${K8S_DEPLOYMENT_NAME} -n ${K8S_NAMESPACE}
+                        """
                     }
                 }
             }
