@@ -1,6 +1,7 @@
 package aivle.project.operation.domain.dto;
 
 import aivle.project.operation.domain.Worker;
+import aivle.project.operation.service.LoginService;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -27,7 +28,7 @@ public class WorkerResponseDto {
                 .workerId(worker.getWorkerId())
                 .loginId(worker.getLoginId())
                 .employeeNumber(worker.getEmployeeNumber())
-                .name(worker.getName())
+                .name(LoginService.maskName(worker.getName()))
                 .taskType(worker.getTaskType())
                 .email(worker.getEmail())
                 .phoneNumber(worker.getPhoneNumber())

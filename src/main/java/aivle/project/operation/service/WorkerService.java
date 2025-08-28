@@ -29,8 +29,7 @@ public class WorkerService {
     public Worker getWorkerById(Long id) {
         Worker worker = workerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("해당 ID의 작업자를 찾을 수 없습니다: "+id));
-        String maskedName = LoginService.maskName(worker.getName());
-        worker.setName(maskedName);
+        
         return worker;
     }
 
