@@ -1,259 +1,117 @@
-# operation
+# Operation Service (운영 관리 서비스)
 
-- (윈도우) 어플리케이션 실행
-```
-.\gradlew.bat bootRun
-```
+## 1. 프로젝트 개요
 
-- 토큰이 필요한 api는 gateway를 꼭 거쳐서 실행할 것
-  - gateway port 8080
-  - operation port 8081
+본 프로젝트는 CHECKAR 서비스의 MSA 구조의 일부로, 사용자 인증 및 내부 운영 관리를 담당하는 백엔드 서비스입니다.
 
-## 회원가입
-- 관리자
-```
-POST http://localhost:8080/api/operation/admin/signup
-```
-```json
-{
-    "loginId": "admin123",
-    "password": "123",
-    "name": "관리자",
-    "email": "admin@example.com",
-    "phoneNumber": "01012345678",
-    "companyNumber": "123-45-67890",
-    "address": "서울특별시 강남구",
-    "adminCode": "ADM001"
-}
-```
+주요 기능으로는 관리자 및 작업자의 회원가입과 로그인, 공지사항 관리, 작업자 정보 관리가 있으며, 안전한 인증을 위해 JWT (JSON Web Token)를 사용하고 Google reCAPTCHA를 통해 보안을 강화합니다.
 
-- 작업자
-```
-POST http://localhost:8080/api/operation/workers/signup
-```
-```json
-{
-    "loginId": "worker123",
-    "password": "123",
-    "name": "작업자",
-    "email": "admin@example.com",
-    "phoneNumber": "01012345678",
-    "companyNumber": "123-45-67890",
-    "address": "서울특별시 강남구"
-}
-```
-- 성공
-```json
-{
-    "loginId": "admin123",
-    "name": "관리자",
-    "email": "admin@example.com",
-    "phoneNumber": "01012345678",
-    "companyNumber": "123-45-67890",
-    "address": "서울특별시 강남구"
-}
-```
-- 실패
-    - 403   
+## 2. 주요 기능
 
-#### httpie
-- 관리자 회원가입
-```bash
-http POST http://localhost:8080/api/operation/admin/signup loginId=admin123 password=123 name=관리자 email=admin@example.com phoneNumber=01012345678 employeeNumber=123-45-67890 address="서울특별시 강남구" adminCode=ADM001
-```
-- 작업자 회원가입
-```bash
-http POST http://localhost:8080/api/operation/workers/signup loginId=worker password=123 name=작업자 email=admin@example.com phoneNumber=01012345678 employeeNumber=123-45-67890 address="서울특별시 강남구"
-```
----
+- **사용자 인증**
+  - 관리자/작업자 회원가입 및 로그인
+  - ID 중복 확인
+  - JWT 토큰 기반의 인증/인가 처리
+  - Google reCAPTCHA를 이용한 봇 방지
+- **공지사항 관리**
+  - 공지사항 CRUD (생성, 조회, 수정, 삭제) 기능
+  - 파일 첨부 기능 (AWS S3 연동)
+- **작업자 관리**
+  - 작업자 목록 조회
+  - 작업자 정보 조회, 수정, 삭제
 
-## 로그인
+## 3. 기술 스택
 
-```
-POST http://localhost:8080/api/operation/admin/login
-```
-```json
-{
-  "loginId": "admin123",
-  "password": "123"
-}
-```
-- 작업자
-```
-POST http://localhost:8080/api/operation/workers/login
-```
-```json
-{
-  "loginId": "admin123",
-  "password": "123"
-}
-```
-- 성공
+- **언어**: Java 21
+- **프레임워크**: Spring Boot 3.5.3
+- **데이터베이스**: MySQL, H2
+- **인증**: Spring Security, JWT (jjwt-api, jjwt-impl, jjwt-jackson)
+- **데이터 액세스**: Spring Data JPA
+- **API 문서화**: SpringDoc OpenAPI (Swagger UI)
+- **파일 저장소**: AWS S3
+- **빌드 도구**: Gradle
+- **배포**: Docker, Kubernetes, Jenkins
 
-```json
-{
-    "token": "token",
-    "role": "ADMIN",
-    "expiresIn": 3600
-}
-```
-- 실패
+## 4. API 명세
 
-```json
-{
-    "message": "ID or password is not correct",
-    "error": "Unauthorized"
-}
-```
-#### httpie
-- 관리자 로그인
-  - 아이디 최소 8자리
-  - 비밀번호 최소 8자리
-    - 특수문자 한개 이상 포함
-```bash
-http POST http://localhost:8080/api/operation/admin/login loginId=admin123 password=12345678!
-```
-- 작업자 로그인
-```bash
-http POST http://localhost:8080/api/operation/workers/login loginId=worker123 password=12345678!
-```
----
+API는 인증이 필요한 경우 요청 헤더에 `Authorization: Bearer <JWT_TOKEN>`을 포함해야 합니다.
 
-## 토큰 테스트용 API
-- 테스트는 gateway를 거쳐야 함
+### 4.1. 인증 (Login & Signup)
 
+| Method | URL                               | 설명                       |
+| ------ | --------------------------------- | -------------------------- |
+| `POST` | `/api/login`                      | 관리자/작업자 로그인       |
+| `POST` | `/api/signup/admin`               | 관리자 회원가입            |
+| `POST` | `/api/signup/admin/check`         | 관리자 ID 중복 확인        |
+| `POST` | `/api/signup/worker`              | 작업자 회원가입            |
 
-- 관리자 토큰 테스트용 API
-```
-POST http://localhost:8080/api/operation/admin/test
-```
-```
-Authorization:"Bearer <JWT-토큰>"
-```
-```json
-{
-    "message": "데이터 요청 A"
-}
-```
+### 4.2. 공지사항 (Notice)
 
-- 작업자 토큰 테스트용 API
-```
-POST http://localhost:8080/api/operation/workers/test
-```
-```
-Authorization:"Bearer <JWT-토큰>"
-```
-```json
-{
-    "message": "데이터 요청 A"
-}
-```
+| Method | URL                               | 설명                       |
+| ------ | --------------------------------- | -------------------------- |
+| `POST` | `/api/notices`                    | 공지사항 생성 (파일 첨부 가능) |
+| `GET`    | `/api/notices`                    | 전체 공지사항 목록 조회    |
+| `GET`    | `/api/notices/{id}`               | 특정 공지사항 상세 조회    |
+| `PUT`    | `/api/notices/{id}`               | 공지사항 수정              |
+| `DELETE` | `/api/notices/{id}`               | 공지사항 삭제              |
 
-- 성공
+### 4.3. 작업자 (Worker)
 
-```json
-{
-    "code": 200,
-    "message": "Token is valid",
-    "request": "데이터 요청 A",
-    "id": 1,
-    "role": "ADMIN"
-}
-```
-- 실패
-    - 403
+| Method | URL                               | 설명                       |
+| ------ | --------------------------------- | -------------------------- |
+| `GET`    | `/api/workers`                    | 전체 작업자 목록 조회      |
+| `GET`    | `/api/workers/{id}`               | 특정 작업자 정보 조회      |
+| `PUT`    | `/api/workers/{id}`               | 작업자 정보 수정           |
+| `DELETE` | `/api/workers/{id}`               | 작업자 계정 삭제           |
 
-#### httpie
-- 관리자 인가 테스트
-```bash
-http POST http://localhost:8080/api/operation/admin/test Authorization:"Bearer {token}" Content-Type:application/json message="요청 1"
-```
-- 작업자 인가 테스트
-```bash
-http POST http://localhost:8080/api/operation/workers/test Authorization:"Bearer {token}" Content-Type:application/json message="요청 1"
-```
+## 5. 실행 방법
 
-## 작업자
+### 5.1. 사전 요구사항
 
-- 목록 조회
-```
-GET :8080/api/operation/workers
-```
+- Java 21
+- Gradle
 
-- 단일 조회
+### 5.2. 빌드 및 실행
 
-```
-GET :8080/api/operation/workers/id
-```
+1.  **프로젝트 클론**
+    ```bash
+    git clone <repository_url>
+    cd operation
+    ```
 
-- 작업자 개인 조회
-```
-GET :8080/api/operation/workers/profile
-```
+2.  **환경 변수 설정**
+    애플리케이션을 실행하기 전에 다음 환경 변수를 설정해야 합니다. `.env` 파일을 사용하거나 실행 환경에 직접 변수를 주입하십시오.
 
-- 작업자 삭제
-```
-DELETE :8080/api/operation/workers/id
-```
+    ```bash
+    # 데이터베이스 연결 정보
+    DB_URL=jdbc:mysql://<your_db_host>:<port>/operation
+    DB_USERNAME=<your_db_username>
+    DB_PASSWORD=<your_db_password>
 
-- 작업 기준 작업자 조회
-```
-GET :8080/api/operation/workers/task?taskType="type"
-```
+    # JWT 시크릿 키
+    JWT_SECRET=<your_jwt_secret_key>
 
-### TODO
-  - 작업자 정보 수정
+    # AWS S3 설정
+    S3_ACCESS_KEY=<your_s3_access_key>
+    S3_SECRET_KEY=<your_s3_secret_key>
+    S3_BUCKET=<your_s3_bucket_name>
 
-## 공지
+    # Google reCAPTCHA 시크릿 키
+    CAPTCHA_SECRET=<your_captcha_secret_key>
+    ```
 
-- 공지 목록 조회
-```
-GET :8080/api/operation/notices
-```
+3.  **빌드**
+    ```bash
+    ./gradlew build
+    ```
 
-- 공지 생성
-  - 토큰 필요
-```
-POST :8080/api/operation/notices
-```
+4.  **실행**
+    ```bash
+    java -jar build/libs/operation-0.0.1-SNAPSHOT.jar
+    ```
 
-```json
-{
-  "title": "title",
-  "content": "content",
-  "fileUrl": "fileUrl"
-}
-```
+## 6. 배포
 
-
-- 공지 수정
-```
-PUT :8080/api/operation/notices/id
-```
-```json
-{
-  "title": "title",
-  "content": "content",
-  "fileUrl": "fileUrl"
-}
-```
-
-- 공지 제목 검색
-```
-GET :8080/api/operation/notices/search/adminId?keyword=""
-```
-
-- 공지 작성자 조회
-```
-GET :8080/api/operation/notices/search/adminId?keyword=""
-```
-
-- 공지 삭제
-```
-DELETE :8080/api/operation/notices/id
-```
-
-- 서버 체크용 api
-```
-GET :8080/api/operation/notices/health
-```
+- **CI/CD**: `Jenkinsfile`을 통해 Jenkins 파이프라인이 구성되어 있습니다.
+- **Containerization**: `Dockerfile`을 사용하여 서비스의 Docker 이미지를 빌드합니다.
+- **Orchestration**: `kubernetes/` 디렉토리의 `deployment.yaml`과 `service.yaml`을 통해 Kubernetes 클러스터에 배포할 수 있습니다.
