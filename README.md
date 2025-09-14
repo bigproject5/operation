@@ -1,4 +1,4 @@
-# Operation Service (운영 관리 서비스)
+# CHECKAR :: Operation Service
 
 ## 1. 프로젝트 개요
 
